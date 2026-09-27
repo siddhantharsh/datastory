@@ -150,7 +150,7 @@ export function DashboardPage({ onBackToHome }) {
     }
 
     return rows;
-  }, [activeDataset, filters, config]);
+  }, [constellationRows, filters, config]);
 
   // Toggle visible column in sidebar selector (Attribute Filter)
   const toggleColumnVisibility = (col) => {
