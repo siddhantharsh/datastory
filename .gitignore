@@ -1,0 +1,12 @@
+node_modules/
+client/dist/
+.env
+.env.*
+*.log
+.DS_Store
+
+server/data.db
+server/data.db-shm
+server/data.db-wal
+server/uploads/*
+!server/uploads/.gitkeep
