@@ -9,7 +9,7 @@ import { ActTrendChart } from '../components/dashboard/ActTrendChart';
 import { ActBreakdownChart } from '../components/dashboard/ActBreakdownChart';
 import { ActComparisonChart } from '../components/dashboard/ActComparisonChart';
 import { ActStandoutsTables } from '../components/dashboard/ActStandoutsTables';
-import { ConstellationView } from '../components/dashboard/ConstellationView';
+import { ParticleSwarm } from '../components/dashboard/ParticleSwarm';
 
 import { useDataset } from '../context/DatasetContext';
 import { generateSmartDashboardConfig, formatColName } from '../utils/smartDetector';
@@ -257,9 +257,9 @@ export function DashboardPage({ onBackToHome }) {
               </section>
             )}
 
-            {/* SLIDE 2 / ACT 2: THE MAP (CONSTELLATION VIEW) */}
+            {/* SLIDE 2 / ACT 2: THE MAP (PARTICLE SWARM VIEW) */}
             {config?.meta && activeDataset?.rows && (
-              <ConstellationView rows={activeDataset.rows} meta={config.meta} actIndex={2} />
+              <ParticleSwarm rows={activeDataset.rows} meta={config.meta} actIndex={2} />
             )}
 
             {/* SLIDE 3 / ACT 3: THE BIG TREND */}
