@@ -1,6 +1,18 @@
 // Narrative Engine & Mathematical Intelligence for DataStory
 import { formatColName, formatNumberValue } from './smartDetector';
 
+// Narratives are rendered via dangerouslySetInnerHTML — any value sourced from
+// uploaded CSV data (category names, dates, column headers) must be escaped
+// before interpolation, or a malicious cell value executes as HTML/JS.
+function escapeHtml(value) {
+  return String(value)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
 export function pearsonCorrelation(data, col1, col2) {
   if (!data || data.length < 2 || !col1 || !col2) return 0;
 
@@ -99,12 +111,12 @@ function buildOverview(data, columns, dateCol, primaryCat) {
       .filter((d) => d && !isNaN(new Date(d).getTime()))
       .sort((a, b) => new Date(a) - new Date(b));
 
-    const minDate = validDates[0] || 'start date';
-    const maxDate = validDates[validDates.length - 1] || 'end date';
+    const minDate = escapeHtml(validDates[0] || 'start date');
+    const maxDate = escapeHtml(validDates[validDates.length - 1] || 'end date');
 
     narrativeText = `You're looking at <span class="font-bold text-[#b5470b]">${rowCount.toLocaleString()} records</span> across <span class="font-bold text-[#161513]">${colCount} columns</span>, spanning <span class="font-bold text-[#161513]">${minDate}</span> to <span class="font-bold text-[#161513]">${maxDate}</span>.`;
   } else {
-    const catColName = primaryCat ? formatColName(primaryCat) : 'attributes';
+    const catColName = escapeHtml(primaryCat ? formatColName(primaryCat) : 'attributes');
     const uniqueVals = new Set(data.map((r) => r[primaryCat]).filter(Boolean));
 
     narrativeText = `You're looking at <span class="font-bold text-[#b5470b]">${rowCount.toLocaleString()} records</span> across <span class="font-bold text-[#161513]">${colCount} columns</span>, covering <span class="font-bold text-[#161513]">${uniqueVals.size} unique ${catColName}</span> values.`;
@@ -141,7 +153,7 @@ function buildTrend(data, dateCol, numCol) {
   const peakDate = String(peak[dateCol] || '');
   const troughDate = String(trough[dateCol] || '');
 
-  const narrativeText = `<span class="font-bold text-[#161513]">${formatColName(numCol)}</span> trended <span class="font-bold text-[#b5470b]">${direction}</span> over this period. It peaked at <span class="font-bold text-[#b5470b]">${peakVal}</span> on <span class="font-bold text-[#161513]">${peakDate}</span> and hit its lowest at <span class="font-bold text-[#6f6a62]">${troughVal}</span> on <span class="font-bold text-[#161513]">${troughDate}</span>.`;
+  const narrativeText = `<span class="font-bold text-[#161513]">${escapeHtml(formatColName(numCol))}</span> trended <span class="font-bold text-[#b5470b]">${direction}</span> over this period. It peaked at <span class="font-bold text-[#b5470b]">${peakVal}</span> on <span class="font-bold text-[#161513]">${escapeHtml(peakDate)}</span> and hit its lowest at <span class="font-bold text-[#6f6a62]">${troughVal}</span> on <span class="font-bold text-[#161513]">${escapeHtml(troughDate)}</span>.`;
 
   return {
     heading: 'The Big Trend',
@@ -177,7 +189,7 @@ function buildBreakdown(data, categoryCol, numCol) {
 
   const ratio = (topVal / (bottomVal || 1)).toFixed(1);
 
-  const narrativeText = `Among <span class="font-bold text-[#161513]">${uniqueCount} ${formatColName(categoryCol)}</span> categories, <span class="font-bold text-[#161513]">${topName}</span> leads with <span class="font-bold text-[#b5470b]">${formatNumberValue(topVal)}</span> — <span class="font-bold text-[#b5470b]">${ratio}×</span> more than <span class="font-bold text-[#161513]">${bottomName}</span> at <span class="font-bold text-[#6f6a62]">${formatNumberValue(bottomVal)}</span>.`;
+  const narrativeText = `Among <span class="font-bold text-[#161513]">${uniqueCount} ${escapeHtml(formatColName(categoryCol))}</span> categories, <span class="font-bold text-[#161513]">${escapeHtml(topName)}</span> leads with <span class="font-bold text-[#b5470b]">${formatNumberValue(topVal)}</span> — <span class="font-bold text-[#b5470b]">${ratio}×</span> more than <span class="font-bold text-[#161513]">${escapeHtml(bottomName)}</span> at <span class="font-bold text-[#6f6a62]">${formatNumberValue(bottomVal)}</span>.`;
 
   return {
     heading: 'The Breakdown',
@@ -197,15 +209,17 @@ function buildComparison(data, col1, col2, xCol) {
   const r = pearsonCorrelation(data, col1, col2);
   const col1Name = formatColName(col1);
   const col2Name = formatColName(col2);
+  const col1NameSafe = escapeHtml(col1Name);
+  const col2NameSafe = escapeHtml(col2Name);
 
   let narrativeText = '';
 
   if (Math.abs(r) > 0.7) {
-    narrativeText = `<span class="font-bold text-[#161513]">${col1Name}</span> and <span class="font-bold text-[#161513]">${col2Name}</span> move closely together (correlation: <span class="font-bold text-[#b5470b]">${r}</span>). When one rises, the other tends to follow.`;
+    narrativeText = `<span class="font-bold text-[#161513]">${col1NameSafe}</span> and <span class="font-bold text-[#161513]">${col2NameSafe}</span> move closely together (correlation: <span class="font-bold text-[#b5470b]">${r}</span>). When one rises, the other tends to follow.`;
   } else if (Math.abs(r) > 0.3) {
-    narrativeText = `There's a moderate relationship between <span class="font-bold text-[#161513]">${col1Name}</span> and <span class="font-bold text-[#161513]">${col2Name}</span> (correlation: <span class="font-bold text-[#b5470b]">${r}</span>).`;
+    narrativeText = `There's a moderate relationship between <span class="font-bold text-[#161513]">${col1NameSafe}</span> and <span class="font-bold text-[#161513]">${col2NameSafe}</span> (correlation: <span class="font-bold text-[#b5470b]">${r}</span>).`;
   } else {
-    narrativeText = `<span class="font-bold text-[#161513]">${col1Name}</span> and <span class="font-bold text-[#161513]">${col2Name}</span> appear to move independently (correlation: <span class="font-bold text-[#6f6a62]">${r}</span>).`;
+    narrativeText = `<span class="font-bold text-[#161513]">${col1NameSafe}</span> and <span class="font-bold text-[#161513]">${col2NameSafe}</span> appear to move independently (correlation: <span class="font-bold text-[#6f6a62]">${r}</span>).`;
   }
 
   return {
@@ -243,10 +257,10 @@ function buildStandouts(data, numCol, categoryCol, dateCol) {
 
   const gapPercent = topVal > 0 ? (((topVal - bottomVal) / topVal) * 100).toFixed(0) : '0';
 
-  const topContext = [topCat, topDate].filter(Boolean).join(', ');
-  const bottomContext = [bottomCat, bottomDate].filter(Boolean).join(', ');
+  const topContext = escapeHtml([topCat, topDate].filter(Boolean).join(', '));
+  const bottomContext = escapeHtml([bottomCat, bottomDate].filter(Boolean).join(', '));
 
-  const narrativeText = `The highest <span class="font-bold text-[#161513]">${formatColName(numCol)}</span> recorded was <span class="font-bold text-[#b5470b]">${formatNumberValue(topVal)}</span>${topContext ? ` (${topContext})` : ''}. The lowest was <span class="font-bold text-[#6f6a62]">${formatNumberValue(bottomVal)}</span>${bottomContext ? ` (${bottomContext})` : ''} — a <span class="font-bold text-[#b5470b]">${gapPercent}%</span> gap.`;
+  const narrativeText = `The highest <span class="font-bold text-[#161513]">${escapeHtml(formatColName(numCol))}</span> recorded was <span class="font-bold text-[#b5470b]">${formatNumberValue(topVal)}</span>${topContext ? ` (${topContext})` : ''}. The lowest was <span class="font-bold text-[#6f6a62]">${formatNumberValue(bottomVal)}</span>${bottomContext ? ` (${bottomContext})` : ''} — a <span class="font-bold text-[#b5470b]">${gapPercent}%</span> gap.`;
 
   return {
     heading: 'What Stands Out',
