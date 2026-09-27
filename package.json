@@ -5,6 +5,7 @@
   "scripts": {
     "dev:server": "cd server && node index.js",
     "dev:client": "cd client && npm run dev",
-    "seed": "node server/scripts/generateSampleData.js"
+    "seed": "node server/scripts/generateSampleData.js",
+    "start": "node server/index.js"
   }
 }

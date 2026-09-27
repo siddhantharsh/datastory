@@ -6,7 +6,9 @@ const fs = require('fs');
 const Papa = require('papaparse');
 const db = require('../db');
 
-const uploadDir = path.join(__dirname, '../uploads');
+const uploadDir = process.env.DATA_DIR
+  ? path.join(process.env.DATA_DIR, 'uploads')
+  : path.join(__dirname, '../uploads');
 if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });
 }
