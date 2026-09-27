@@ -1,0 +1,501 @@
+date,building_name,floor,kwh_used,peak_hour_usage,solar_generated,temperature_celsius
+2024-01-01,"Tech Tower A","Floor 1",744,416,52,17.7
+2024-01-02,"Innovation Lab","Floor 2",709,400,62,16.2
+2024-01-04,"Science Block B","Floor 3",694,311,46,18.7
+2024-01-05,"Admin HQ","Floor 4",464,232,39,17.8
+2024-01-07,"Student Center","Floor 5",463,201,51,18.4
+2024-01-08,"Tech Tower A","Floor 1",429,197,38,19
+2024-01-09,"Innovation Lab","Floor 2",685,371,29,19.4
+2024-01-11,"Science Block B","Floor 3",675,364,41,16.7
+2024-01-13,"Admin HQ","Floor 4",642,332,58,17.3
+2024-01-14,"Student Center","Floor 5",540,197,76,19.4
+2024-01-15,"Tech Tower A","Floor 1",468,189,61,19.2
+2024-01-17,"Innovation Lab","Floor 2",515,241,61,17.6
+2024-01-18,"Science Block B","Floor 3",703,272,43,17.8
+2024-01-20,"Admin HQ","Floor 4",461,223,44,18.1
+2024-01-21,"Student Center","Floor 5",410,222,65,19.4
+2024-01-23,"Tech Tower A","Floor 1",734,423,19,17.8
+2024-01-24,"Innovation Lab","Floor 2",778,304,39,16.5
+2024-01-26,"Science Block B","Floor 3",549,275,28,18.1
+2024-01-27,"Admin HQ","Floor 4",555,229,66,16.6
+2024-01-29,"Student Center","Floor 5",676,348,39,16.7
+2024-01-30,"Tech Tower A","Floor 1",562,228,60,18.6
+2024-02-01,"Innovation Lab","Floor 2",499,192,98,24.7
+2024-02-02,"Science Block B","Floor 3",510,213,101,24.5
+2024-02-04,"Admin HQ","Floor 4",569,240,50,25.2
+2024-02-05,"Student Center","Floor 5",518,231,60,25.4
+2024-02-06,"Tech Tower A","Floor 1",633,366,49,26
+2024-02-08,"Innovation Lab","Floor 2",795,388,51,25.8
+2024-02-09,"Science Block B","Floor 3",748,271,53,24.3
+2024-02-10,"Admin HQ","Floor 4",580,243,92,23.9
+2024-02-12,"Student Center","Floor 5",597,215,67,23.9
+2024-02-14,"Tech Tower A","Floor 1",472,222,100,24.3
+2024-02-15,"Innovation Lab","Floor 2",691,249,99,24
+2024-02-17,"Science Block B","Floor 3",454,256,70,22.6
+2024-02-18,"Admin HQ","Floor 4",588,336,49,25.1
+2024-02-19,"Student Center","Floor 5",794,423,53,26
+2024-02-21,"Tech Tower A","Floor 1",535,319,75,25.8
+2024-02-22,"Innovation Lab","Floor 2",547,230,70,22.2
+2024-02-24,"Science Block B","Floor 3",684,255,66,22.8
+2024-02-25,"Admin HQ","Floor 4",523,295,85,23.6
+2024-02-27,"Student Center","Floor 5",772,431,68,25.9
+2024-02-28,"Tech Tower A","Floor 1",579,335,63,24.7
+2024-03-01,"Innovation Lab","Floor 2",874,350,135,30.1
+2024-03-02,"Science Block B","Floor 3",747,267,92,28.2
+2024-03-04,"Admin HQ","Floor 4",677,258,113,26.6
+2024-03-05,"Student Center","Floor 5",830,393,134,27.2
+2024-03-06,"Tech Tower A","Floor 1",801,352,116,27.4
+2024-03-08,"Innovation Lab","Floor 2",809,325,132,28.9
+2024-03-09,"Science Block B","Floor 3",755,303,112,28.1
+2024-03-11,"Admin HQ","Floor 4",815,433,125,30.3
+2024-03-12,"Student Center","Floor 5",815,391,131,27.9
+2024-03-14,"Tech Tower A","Floor 1",794,284,117,27
+2024-03-15,"Innovation Lab","Floor 2",793,464,135,28.7
+2024-03-17,"Science Block B","Floor 3",600,341,100,27.3
+2024-03-18,"Admin HQ","Floor 4",848,478,117,30.4
+2024-03-19,"Student Center","Floor 5",681,305,111,28.8
+2024-03-21,"Tech Tower A","Floor 1",676,255,111,28
+2024-03-23,"Innovation Lab","Floor 2",629,235,120,28.8
+2024-03-24,"Science Block B","Floor 3",817,458,106,28.4
+2024-03-25,"Admin HQ","Floor 4",706,306,114,27.2
+2024-03-27,"Student Center","Floor 5",725,369,109,28.7
+2024-03-28,"Tech Tower A","Floor 1",726,378,92,26.4
+2024-03-30,"Innovation Lab","Floor 2",803,282,145,26.5
+2024-03-31,"Science Block B","Floor 3",827,408,97,28.4
+2024-04-02,"Admin HQ","Floor 4",828,313,160,31.8
+2024-04-03,"Student Center","Floor 5",955,531,176,30.3
+2024-04-05,"Tech Tower A","Floor 1",951,458,146,30.8
+2024-04-06,"Innovation Lab","Floor 2",724,367,135,29
+2024-04-07,"Science Block B","Floor 3",938,400,141,29.8
+2024-04-09,"Admin HQ","Floor 4",833,497,150,31.6
+2024-04-10,"Student Center","Floor 5",902,414,179,29.2
+2024-04-12,"Tech Tower A","Floor 1",878,454,169,31.7
+2024-04-13,"Innovation Lab","Floor 2",925,337,146,30.3
+2024-04-15,"Science Block B","Floor 3",703,380,184,30.4
+2024-04-16,"Admin HQ","Floor 4",801,424,173,30.4
+2024-04-18,"Student Center","Floor 5",736,333,164,28.1
+2024-04-19,"Tech Tower A","Floor 1",934,520,155,30.6
+2024-04-21,"Innovation Lab","Floor 2",809,452,127,31.5
+2024-04-22,"Science Block B","Floor 3",636,340,151,29.1
+2024-04-24,"Admin HQ","Floor 4",760,332,152,28.4
+2024-04-25,"Student Center","Floor 5",874,456,138,29
+2024-04-27,"Tech Tower A","Floor 1",806,338,151,29.9
+2024-04-28,"Innovation Lab","Floor 2",989,544,185,30.9
+2024-04-29,"Science Block B","Floor 3",783,291,158,30.4
+2024-05-01,"Admin HQ","Floor 4",859,326,188,30.3
+2024-05-02,"Student Center","Floor 5",567,211,186,27
+2024-05-04,"Tech Tower A","Floor 1",856,416,188,29.1
+2024-05-05,"Innovation Lab","Floor 2",679,374,170,26.6
+2024-05-07,"Science Block B","Floor 3",743,272,180,28.1
+2024-05-08,"Admin HQ","Floor 4",705,335,169,26.6
+2024-05-10,"Student Center","Floor 5",686,277,202,28.9
+2024-05-11,"Tech Tower A","Floor 1",597,300,209,26.4
+2024-05-13,"Innovation Lab","Floor 2",698,364,207,28.1
+2024-05-14,"Science Block B","Floor 3",901,324,181,29.6
+2024-05-16,"Admin HQ","Floor 4",881,472,195,29.9
+2024-05-17,"Student Center","Floor 5",645,257,189,29.1
+2024-05-19,"Tech Tower A","Floor 1",605,299,185,27
+2024-05-20,"Innovation Lab","Floor 2",724,419,209,28.6
+2024-05-21,"Science Block B","Floor 3",660,290,178,28.9
+2024-05-23,"Admin HQ","Floor 4",797,349,174,26.6
+2024-05-24,"Student Center","Floor 5",885,376,211,28.4
+2024-05-26,"Tech Tower A","Floor 1",737,378,192,30
+2024-05-27,"Innovation Lab","Floor 2",719,379,194,29.8
+2024-05-29,"Science Block B","Floor 3",781,345,213,27.5
+2024-05-30,"Admin HQ","Floor 4",946,383,202,30.3
+2024-05-31,"Student Center","Floor 5",633,241,195,26.6
+2024-06-02,"Tech Tower A","Floor 1",618,368,189,23
+2024-06-04,"Innovation Lab","Floor 2",626,284,219,25
+2024-06-05,"Science Block B","Floor 3",616,308,198,24.1
+2024-06-07,"Admin HQ","Floor 4",662,293,180,23.8
+2024-06-08,"Student Center","Floor 5",545,204,193,23.1
+2024-06-09,"Tech Tower A","Floor 1",497,224,201,23
+2024-06-11,"Innovation Lab","Floor 2",674,397,216,23.7
+2024-06-12,"Science Block B","Floor 3",770,364,190,25.8
+2024-06-14,"Admin HQ","Floor 4",425,183,181,23.1
+2024-06-15,"Student Center","Floor 5",513,245,232,22.4
+2024-06-17,"Tech Tower A","Floor 1",537,200,197,24.1
+2024-06-18,"Innovation Lab","Floor 2",569,335,176,23.9
+2024-06-20,"Science Block B","Floor 3",605,271,177,23
+2024-06-21,"Admin HQ","Floor 4",482,283,187,22.4
+2024-06-23,"Student Center","Floor 5",644,334,183,24.6
+2024-06-24,"Tech Tower A","Floor 1",763,285,232,25.6
+2024-06-25,"Innovation Lab","Floor 2",468,276,203,22.5
+2024-06-27,"Science Block B","Floor 3",548,192,233,22.9
+2024-06-28,"Admin HQ","Floor 4",715,300,212,25.2
+2024-06-30,"Student Center","Floor 5",465,234,208,23.2
+2024-07-01,"Tech Tower A","Floor 1",739,437,218,17.3
+2024-07-03,"Innovation Lab","Floor 2",589,280,236,16.8
+2024-07-04,"Science Block B","Floor 3",656,284,200,18.7
+2024-07-06,"Admin HQ","Floor 4",661,278,239,18.9
+2024-07-07,"Student Center","Floor 5",591,272,223,17.9
+2024-07-09,"Tech Tower A","Floor 1",671,302,208,18.7
+2024-07-10,"Innovation Lab","Floor 2",596,305,212,18.4
+2024-07-11,"Science Block B","Floor 3",760,377,207,16
+2024-07-13,"Admin HQ","Floor 4",474,260,182,17.5
+2024-07-15,"Student Center","Floor 5",764,358,193,16.3
+2024-07-16,"Tech Tower A","Floor 1",768,447,199,16.6
+2024-07-17,"Innovation Lab","Floor 2",656,368,198,16.6
+2024-07-19,"Science Block B","Floor 3",700,301,237,16.1
+2024-07-20,"Admin HQ","Floor 4",595,229,237,18.7
+2024-07-22,"Student Center","Floor 5",569,201,209,18.9
+2024-07-23,"Tech Tower A","Floor 1",725,262,206,18.7
+2024-07-25,"Innovation Lab","Floor 2",434,250,237,19.3
+2024-07-26,"Science Block B","Floor 3",435,170,194,18.9
+2024-07-28,"Admin HQ","Floor 4",667,236,193,19
+2024-07-29,"Student Center","Floor 5",589,314,203,17.4
+2024-07-30,"Tech Tower A","Floor 1",656,267,196,17.2
+2024-08-01,"Innovation Lab","Floor 2",781,339,175,13.5
+2024-08-02,"Science Block B","Floor 3",824,437,224,11
+2024-08-04,"Admin HQ","Floor 4",870,444,200,14
+2024-08-05,"Student Center","Floor 5",963,372,196,10.3
+2024-08-07,"Tech Tower A","Floor 1",694,333,199,13
+2024-08-08,"Innovation Lab","Floor 2",884,364,224,12.1
+2024-08-10,"Science Block B","Floor 3",953,507,229,12.2
+2024-08-11,"Admin HQ","Floor 4",847,299,178,10.8
+2024-08-13,"Student Center","Floor 5",727,424,175,13.8
+2024-08-14,"Tech Tower A","Floor 1",855,301,205,11.6
+2024-08-16,"Innovation Lab","Floor 2",736,290,229,12.1
+2024-08-17,"Science Block B","Floor 3",676,361,227,12.6
+2024-08-18,"Admin HQ","Floor 4",881,319,230,11.4
+2024-08-20,"Student Center","Floor 5",676,284,214,13.6
+2024-08-22,"Tech Tower A","Floor 1",690,363,188,11.3
+2024-08-23,"Innovation Lab","Floor 2",796,378,231,11.4
+2024-08-24,"Science Block B","Floor 3",935,380,174,12.4
+2024-08-26,"Admin HQ","Floor 4",832,379,223,10.8
+2024-08-27,"Student Center","Floor 5",842,486,175,13.9
+2024-08-29,"Tech Tower A","Floor 1",823,303,200,12.7
+2024-08-30,"Innovation Lab","Floor 2",787,461,202,11.4
+2024-09-01,"Science Block B","Floor 3",1083,460,161,6.2
+2024-09-02,"Admin HQ","Floor 4",885,337,164,6.6
+2024-09-04,"Student Center","Floor 5",863,356,171,7.9
+2024-09-05,"Tech Tower A","Floor 1",878,399,164,8.4
+2024-09-06,"Innovation Lab","Floor 2",958,362,171,6.5
+2024-09-08,"Science Block B","Floor 3",1094,441,208,7.1
+2024-09-10,"Admin HQ","Floor 4",1102,392,203,7.5
+2024-09-11,"Student Center","Floor 5",1009,589,177,8.2
+2024-09-12,"Tech Tower A","Floor 1",1037,593,162,7.3
+2024-09-14,"Innovation Lab","Floor 2",794,367,215,8.4
+2024-09-15,"Science Block B","Floor 3",1027,568,201,6.9
+2024-09-16,"Admin HQ","Floor 4",1023,527,173,8.6
+2024-09-18,"Student Center","Floor 5",1004,541,189,7.7
+2024-09-19,"Tech Tower A","Floor 1",990,568,197,9.2
+2024-09-21,"Innovation Lab","Floor 2",802,287,204,9.3
+2024-09-22,"Science Block B","Floor 3",959,542,167,8.6
+2024-09-24,"Admin HQ","Floor 4",1073,617,197,5.8
+2024-09-25,"Student Center","Floor 5",758,404,164,9.6
+2024-09-27,"Tech Tower A","Floor 1",1025,575,186,8.3
+2024-09-28,"Innovation Lab","Floor 2",847,460,176,9
+2024-09-30,"Science Block B","Floor 3",1129,437,197,6.7
+2024-10-01,"Admin HQ","Floor 4",1011,575,142,6.3
+2024-10-03,"Student Center","Floor 5",1025,610,128,7.5
+2024-10-04,"Tech Tower A","Floor 1",863,393,132,7.2
+2024-10-05,"Innovation Lab","Floor 2",963,479,163,6.6
+2024-10-07,"Science Block B","Floor 3",1103,606,176,4.9
+2024-10-09,"Admin HQ","Floor 4",1106,395,129,6.8
+2024-10-10,"Student Center","Floor 5",897,513,145,7.2
+2024-10-11,"Tech Tower A","Floor 1",1150,439,127,5.6
+2024-10-13,"Innovation Lab","Floor 2",1113,603,159,4.7
+2024-10-14,"Science Block B","Floor 3",1031,446,172,6.8
+2024-10-16,"Admin HQ","Floor 4",1052,568,164,6.6
+2024-10-17,"Student Center","Floor 5",1080,432,162,6.6
+2024-10-19,"Tech Tower A","Floor 1",1127,511,153,4
+2024-10-20,"Innovation Lab","Floor 2",927,465,137,6.4
+2024-10-21,"Science Block B","Floor 3",984,378,159,6.2
+2024-10-23,"Admin HQ","Floor 4",1003,592,161,7.9
+2024-10-25,"Student Center","Floor 5",888,360,140,7.6
+2024-10-26,"Tech Tower A","Floor 1",984,515,179,6
+2024-10-28,"Innovation Lab","Floor 2",1160,543,174,6.4
+2024-10-29,"Science Block B","Floor 3",1170,689,172,4.2
+2024-10-31,"Admin HQ","Floor 4",1012,411,161,4.5
+2024-11-01,"Student Center","Floor 5",932,528,103,6.4
+2024-11-03,"Tech Tower A","Floor 1",1008,524,123,5.7
+2024-11-04,"Innovation Lab","Floor 2",843,499,127,9.2
+2024-11-05,"Science Block B","Floor 3",893,350,145,8.5
+2024-11-07,"Admin HQ","Floor 4",1011,434,104,7.3
+2024-11-08,"Student Center","Floor 5",1036,466,133,8.2
+2024-11-10,"Tech Tower A","Floor 1",792,393,120,9.4
+2024-11-11,"Innovation Lab","Floor 2",886,461,112,8.7
+2024-11-13,"Science Block B","Floor 3",873,488,101,7.5
+2024-11-14,"Admin HQ","Floor 4",973,463,138,7.5
+2024-11-15,"Student Center","Floor 5",975,527,133,6.5
+2024-11-17,"Tech Tower A","Floor 1",889,506,113,8.9
+2024-11-19,"Innovation Lab","Floor 2",1025,444,137,9.3
+2024-11-20,"Science Block B","Floor 3",1148,629,101,6.4
+2024-11-21,"Admin HQ","Floor 4",831,482,94,8.9
+2024-11-23,"Student Center","Floor 5",1014,508,143,7
+2024-11-24,"Tech Tower A","Floor 1",1087,557,129,8.4
+2024-11-26,"Innovation Lab","Floor 2",929,514,121,6.4
+2024-11-27,"Science Block B","Floor 3",1089,436,133,7.5
+2024-11-28,"Admin HQ","Floor 4",1008,499,126,5.6
+2024-11-30,"Student Center","Floor 5",1015,383,103,6.8
+2024-12-02,"Tech Tower A","Floor 1",757,350,87,13
+2024-12-03,"Innovation Lab","Floor 2",792,459,95,10.8
+2024-12-05,"Science Block B","Floor 3",737,419,54,13.2
+2024-12-06,"Admin HQ","Floor 4",697,264,76,13.7
+2024-12-07,"Student Center","Floor 5",845,492,97,11.4
+2024-12-09,"Tech Tower A","Floor 1",681,251,83,13.5
+2024-12-10,"Innovation Lab","Floor 2",835,342,85,13.7
+2024-12-12,"Science Block B","Floor 3",816,475,47,12.1
+2024-12-13,"Admin HQ","Floor 4",956,456,86,10.1
+2024-12-15,"Student Center","Floor 5",972,463,58,11.2
+2024-12-16,"Tech Tower A","Floor 1",947,397,55,11.6
+2024-12-17,"Innovation Lab","Floor 2",759,283,95,10.8
+2024-12-19,"Science Block B","Floor 3",931,536,55,10.5
+2024-12-20,"Admin HQ","Floor 4",964,382,76,11.3
+2024-12-22,"Student Center","Floor 5",761,287,88,10.3
+2024-12-24,"Tech Tower A","Floor 1",804,321,58,10.9
+2024-12-25,"Innovation Lab","Floor 2",710,389,88,11.6
+2024-12-27,"Science Block B","Floor 3",871,504,59,10.9
+2024-12-28,"Admin HQ","Floor 4",684,331,105,11.6
+2024-12-29,"Student Center","Floor 5",830,375,92,10.9
+2024-12-31,"Tech Tower A","Floor 1",902,401,69,11.3
+2025-01-01,"Innovation Lab","Floor 2",566,199,60,16.7
+2025-01-03,"Science Block B","Floor 3",552,311,28,16.8
+2025-01-04,"Admin HQ","Floor 4",586,252,76,16.4
+2025-01-06,"Student Center","Floor 5",461,205,57,18.4
+2025-01-07,"Tech Tower A","Floor 1",528,280,28,16.5
+2025-01-08,"Innovation Lab","Floor 2",520,201,30,18.7
+2025-01-10,"Science Block B","Floor 3",549,270,74,17.2
+2025-01-11,"Admin HQ","Floor 4",475,207,41,19.7
+2025-01-13,"Student Center","Floor 5",566,211,48,18.8
+2025-01-14,"Tech Tower A","Floor 1",483,195,51,18.7
+2025-01-16,"Innovation Lab","Floor 2",590,285,48,18.9
+2025-01-17,"Science Block B","Floor 3",782,284,31,16.8
+2025-01-19,"Admin HQ","Floor 4",628,352,27,20
+2025-01-20,"Student Center","Floor 5",552,278,51,19.7
+2025-01-22,"Tech Tower A","Floor 1",638,363,24,19.5
+2025-01-23,"Innovation Lab","Floor 2",453,190,37,18.7
+2025-01-25,"Science Block B","Floor 3",797,350,54,16.7
+2025-01-26,"Admin HQ","Floor 4",678,280,36,17.8
+2025-01-28,"Student Center","Floor 5",503,191,36,19.3
+2025-01-29,"Tech Tower A","Floor 1",548,291,35,17.4
+2025-01-30,"Innovation Lab","Floor 2",535,269,69,19.5
+2025-02-01,"Science Block B","Floor 3",757,270,75,24.7
+2025-02-02,"Admin HQ","Floor 4",528,221,102,24
+2025-02-04,"Student Center","Floor 5",739,397,98,23.8
+2025-02-05,"Tech Tower A","Floor 1",475,180,100,23.6
+2025-02-07,"Innovation Lab","Floor 2",569,320,48,25.5
+2025-02-08,"Science Block B","Floor 3",501,255,57,22.4
+2025-02-09,"Admin HQ","Floor 4",666,387,50,24.8
+2025-02-11,"Student Center","Floor 5",637,296,73,25
+2025-02-13,"Tech Tower A","Floor 1",461,259,72,23.3
+2025-02-14,"Innovation Lab","Floor 2",554,249,69,23.7
+2025-02-15,"Science Block B","Floor 3",738,406,97,25.1
+2025-02-17,"Admin HQ","Floor 4",610,228,75,22.7
+2025-02-19,"Student Center","Floor 5",504,176,54,23.3
+2025-02-20,"Tech Tower A","Floor 1",524,206,102,23.7
+2025-02-21,"Innovation Lab","Floor 2",663,379,86,24.7
+2025-02-23,"Science Block B","Floor 3",445,187,54,22.7
+2025-02-24,"Admin HQ","Floor 4",424,181,57,22.1
+2025-02-26,"Student Center","Floor 5",633,363,49,23.8
+2025-02-27,"Tech Tower A","Floor 1",684,299,89,22.6
+2025-03-01,"Innovation Lab","Floor 2",691,400,123,27.1
+2025-03-02,"Science Block B","Floor 3",643,294,125,28.1
+2025-03-04,"Admin HQ","Floor 4",583,212,97,27.6
+2025-03-05,"Student Center","Floor 5",624,336,96,28.7
+2025-03-07,"Tech Tower A","Floor 1",570,267,121,27.1
+2025-03-08,"Innovation Lab","Floor 2",780,426,148,27.7
+2025-03-09,"Science Block B","Floor 3",731,311,90,28.1
+2025-03-11,"Admin HQ","Floor 4",876,486,135,29.5
+2025-03-12,"Student Center","Floor 5",910,509,123,30.2
+2025-03-14,"Tech Tower A","Floor 1",684,323,129,26.7
+2025-03-15,"Innovation Lab","Floor 2",768,437,136,27.5
+2025-03-17,"Science Block B","Floor 3",862,318,120,29.8
+2025-03-18,"Admin HQ","Floor 4",968,459,109,30.4
+2025-03-19,"Student Center","Floor 5",758,283,98,27.5
+2025-03-21,"Tech Tower A","Floor 1",658,392,118,29
+2025-03-23,"Innovation Lab","Floor 2",775,337,115,27.8
+2025-03-24,"Science Block B","Floor 3",670,359,95,27.2
+2025-03-26,"Admin HQ","Floor 4",814,405,116,27.5
+2025-03-27,"Student Center","Floor 5",708,327,93,29.6
+2025-03-28,"Tech Tower A","Floor 1",617,358,110,27
+2025-03-30,"Innovation Lab","Floor 2",759,447,98,29.6
+2025-03-31,"Science Block B","Floor 3",719,310,124,28.4
+2025-04-02,"Admin HQ","Floor 4",838,333,145,28.7
+2025-04-03,"Student Center","Floor 5",682,264,172,29.2
+2025-04-05,"Tech Tower A","Floor 1",722,417,156,28.5
+2025-04-06,"Innovation Lab","Floor 2",772,294,179,30.2
+2025-04-08,"Science Block B","Floor 3",690,311,154,30.6
+2025-04-09,"Admin HQ","Floor 4",734,327,143,28.1
+2025-04-11,"Student Center","Floor 5",872,349,146,29.5
+2025-04-12,"Tech Tower A","Floor 1",1011,505,143,32
+2025-04-13,"Innovation Lab","Floor 2",683,268,142,29.4
+2025-04-15,"Science Block B","Floor 3",647,243,184,28.4
+2025-04-16,"Admin HQ","Floor 4",782,277,180,30.8
+2025-04-18,"Student Center","Floor 5",871,435,156,30.2
+2025-04-19,"Tech Tower A","Floor 1",943,422,131,30.5
+2025-04-21,"Innovation Lab","Floor 2",780,296,137,31.9
+2025-04-22,"Science Block B","Floor 3",841,436,138,30.2
+2025-04-23,"Admin HQ","Floor 4",742,287,156,31
+2025-04-25,"Student Center","Floor 5",825,325,155,28.1
+2025-04-26,"Tech Tower A","Floor 1",861,368,150,30.8
+2025-04-28,"Innovation Lab","Floor 2",775,350,184,31.8
+2025-04-30,"Science Block B","Floor 3",948,522,182,30.2
+2025-05-01,"Admin HQ","Floor 4",677,380,179,28.3
+2025-05-02,"Student Center","Floor 5",814,485,182,28.1
+2025-05-04,"Tech Tower A","Floor 1",694,367,174,30
+2025-05-05,"Innovation Lab","Floor 2",802,303,208,26.5
+2025-05-07,"Science Block B","Floor 3",858,404,206,29.6
+2025-05-08,"Admin HQ","Floor 4",681,259,179,26.7
+2025-05-10,"Student Center","Floor 5",770,321,158,30.1
+2025-05-11,"Tech Tower A","Floor 1",703,419,164,28.6
+2025-05-13,"Innovation Lab","Floor 2",643,257,191,28.8
+2025-05-14,"Science Block B","Floor 3",709,271,163,27.2
+2025-05-16,"Admin HQ","Floor 4",848,351,187,27.9
+2025-05-17,"Student Center","Floor 5",745,423,189,27.3
+2025-05-18,"Tech Tower A","Floor 1",827,434,178,28.3
+2025-05-20,"Innovation Lab","Floor 2",629,286,207,27.6
+2025-05-21,"Science Block B","Floor 3",694,259,193,28
+2025-05-23,"Admin HQ","Floor 4",750,338,182,27.6
+2025-05-24,"Student Center","Floor 5",716,406,180,30.1
+2025-05-26,"Tech Tower A","Floor 1",811,291,210,26.8
+2025-05-27,"Innovation Lab","Floor 2",789,369,185,29.3
+2025-05-29,"Science Block B","Floor 3",877,476,177,29.8
+2025-05-30,"Admin HQ","Floor 4",625,294,173,28.7
+2025-06-01,"Student Center","Floor 5",637,321,178,25.9
+2025-06-02,"Tech Tower A","Floor 1",547,193,198,24.8
+2025-06-04,"Innovation Lab","Floor 2",584,336,195,22.1
+2025-06-05,"Science Block B","Floor 3",653,289,203,22.5
+2025-06-07,"Admin HQ","Floor 4",499,254,198,24.9
+2025-06-08,"Student Center","Floor 5",576,333,216,25.4
+2025-06-09,"Tech Tower A","Floor 1",714,377,207,25.3
+2025-06-11,"Innovation Lab","Floor 2",433,251,227,22.3
+2025-06-12,"Science Block B","Floor 3",687,379,188,24.6
+2025-06-14,"Admin HQ","Floor 4",591,343,204,23.7
+2025-06-15,"Student Center","Floor 5",440,194,189,22.3
+2025-06-17,"Tech Tower A","Floor 1",742,417,193,25
+2025-06-18,"Innovation Lab","Floor 2",539,194,227,22
+2025-06-20,"Science Block B","Floor 3",809,351,207,25.9
+2025-06-21,"Admin HQ","Floor 4",557,286,176,24.3
+2025-06-22,"Student Center","Floor 5",435,191,207,23.1
+2025-06-24,"Tech Tower A","Floor 1",649,291,177,24.6
+2025-06-25,"Innovation Lab","Floor 2",698,361,197,23.4
+2025-06-27,"Science Block B","Floor 3",746,341,209,25.8
+2025-06-29,"Admin HQ","Floor 4",543,234,217,23
+2025-06-30,"Student Center","Floor 5",549,300,207,25
+2025-07-01,"Tech Tower A","Floor 1",602,285,228,17
+2025-07-03,"Innovation Lab","Floor 2",460,229,194,17.9
+2025-07-04,"Science Block B","Floor 3",584,259,197,18.7
+2025-07-06,"Admin HQ","Floor 4",479,245,181,19.2
+2025-07-07,"Student Center","Floor 5",621,250,197,19.9
+2025-07-09,"Tech Tower A","Floor 1",653,321,198,19
+2025-07-10,"Innovation Lab","Floor 2",602,232,190,17.5
+2025-07-11,"Science Block B","Floor 3",690,408,193,19
+2025-07-13,"Admin HQ","Floor 4",500,200,221,19
+2025-07-14,"Student Center","Floor 5",568,266,220,17.2
+2025-07-16,"Tech Tower A","Floor 1",563,328,190,16.8
+2025-07-18,"Innovation Lab","Floor 2",606,318,230,19.5
+2025-07-19,"Science Block B","Floor 3",697,248,185,18.8
+2025-07-20,"Admin HQ","Floor 4",644,288,182,17.3
+2025-07-22,"Student Center","Floor 5",669,256,214,18.6
+2025-07-23,"Tech Tower A","Floor 1",667,303,223,16.7
+2025-07-25,"Innovation Lab","Floor 2",731,357,190,16.8
+2025-07-26,"Science Block B","Floor 3",634,343,220,18.6
+2025-07-28,"Admin HQ","Floor 4",613,327,215,19
+2025-07-29,"Student Center","Floor 5",442,161,213,19
+2025-07-30,"Tech Tower A","Floor 1",616,262,195,18.6
+2025-08-01,"Innovation Lab","Floor 2",785,469,233,12.4
+2025-08-02,"Science Block B","Floor 3",868,358,177,12.4
+2025-08-04,"Admin HQ","Floor 4",908,530,207,11.7
+2025-08-06,"Student Center","Floor 5",684,323,224,12
+2025-08-07,"Tech Tower A","Floor 1",868,465,198,10.1
+2025-08-08,"Innovation Lab","Floor 2",763,282,181,11.5
+2025-08-10,"Science Block B","Floor 3",938,496,192,11.8
+2025-08-11,"Admin HQ","Floor 4",629,271,208,13.9
+2025-08-12,"Student Center","Floor 5",614,326,175,14
+2025-08-14,"Tech Tower A","Floor 1",838,387,233,12.2
+2025-08-15,"Innovation Lab","Floor 2",840,380,179,13.7
+2025-08-17,"Science Block B","Floor 3",896,521,214,13.7
+2025-08-19,"Admin HQ","Floor 4",606,308,207,13.8
+2025-08-20,"Student Center","Floor 5",961,465,227,11.7
+2025-08-21,"Tech Tower A","Floor 1",839,461,205,14
+2025-08-23,"Innovation Lab","Floor 2",630,369,233,13.6
+2025-08-24,"Science Block B","Floor 3",785,422,215,12.3
+2025-08-25,"Admin HQ","Floor 4",817,297,180,13.4
+2025-08-27,"Student Center","Floor 5",663,334,174,12.1
+2025-08-29,"Tech Tower A","Floor 1",805,462,226,11.1
+2025-08-30,"Innovation Lab","Floor 2",775,459,175,11.7
+2025-09-01,"Science Block B","Floor 3",763,373,192,9.3
+2025-09-02,"Admin HQ","Floor 4",1104,586,186,7.7
+2025-09-03,"Student Center","Floor 5",965,534,193,8.6
+2025-09-05,"Tech Tower A","Floor 1",893,335,174,8.4
+2025-09-06,"Innovation Lab","Floor 2",860,362,210,8.4
+2025-09-08,"Science Block B","Floor 3",1057,471,207,6.3
+2025-09-09,"Admin HQ","Floor 4",931,528,180,7.6
+2025-09-11,"Student Center","Floor 5",936,427,162,9.3
+2025-09-12,"Tech Tower A","Floor 1",1148,539,162,6.4
+2025-09-14,"Innovation Lab","Floor 2",1128,411,186,6.9
+2025-09-15,"Science Block B","Floor 3",782,408,182,9
+2025-09-16,"Admin HQ","Floor 4",978,365,158,9.2
+2025-09-18,"Student Center","Floor 5",1076,621,178,7.8
+2025-09-20,"Tech Tower A","Floor 1",866,392,210,7.2
+2025-09-21,"Innovation Lab","Floor 2",894,383,156,9.1
+2025-09-22,"Science Block B","Floor 3",1009,499,207,9.3
+2025-09-24,"Admin HQ","Floor 4",972,512,171,8.1
+2025-09-25,"Student Center","Floor 5",915,389,160,7.3
+2025-09-27,"Tech Tower A","Floor 1",851,331,178,6.9
+2025-09-28,"Innovation Lab","Floor 2",892,478,168,7.4
+2025-09-30,"Science Block B","Floor 3",825,337,198,8.5
+2025-10-01,"Admin HQ","Floor 4",972,468,154,4.1
+2025-10-03,"Student Center","Floor 5",1013,574,147,7.1
+2025-10-04,"Tech Tower A","Floor 1",1134,592,178,5.5
+2025-10-06,"Innovation Lab","Floor 2",1000,542,145,6.4
+2025-10-07,"Science Block B","Floor 3",940,457,153,7.3
+2025-10-08,"Admin HQ","Floor 4",942,379,149,7.4
+2025-10-10,"Student Center","Floor 5",1154,685,129,6.3
+2025-10-12,"Tech Tower A","Floor 1",1146,497,176,5
+2025-10-13,"Innovation Lab","Floor 2",961,464,134,8
+2025-10-14,"Science Block B","Floor 3",1064,510,134,5.4
+2025-10-16,"Admin HQ","Floor 4",1067,629,128,5.6
+2025-10-17,"Student Center","Floor 5",1035,423,141,5.3
+2025-10-19,"Tech Tower A","Floor 1",925,476,129,7.3
+2025-10-20,"Innovation Lab","Floor 2",1024,438,141,4.6
+2025-10-21,"Science Block B","Floor 3",968,398,157,4.7
+2025-10-23,"Admin HQ","Floor 4",976,436,180,5.3
+2025-10-25,"Student Center","Floor 5",1161,635,131,5.9
+2025-10-26,"Tech Tower A","Floor 1",1032,453,150,6.5
+2025-10-27,"Innovation Lab","Floor 2",959,440,135,6.7
+2025-10-29,"Science Block B","Floor 3",915,321,143,7
+2025-10-30,"Admin HQ","Floor 4",904,497,157,6
+2025-11-01,"Student Center","Floor 5",952,507,98,8.9
+2025-11-02,"Tech Tower A","Floor 1",947,553,142,6.8
+2025-11-04,"Innovation Lab","Floor 2",950,378,104,5.7
+2025-11-05,"Science Block B","Floor 3",1047,468,144,9.5
+2025-11-07,"Admin HQ","Floor 4",993,487,122,6.3
+2025-11-08,"Student Center","Floor 5",967,535,90,6.8
+2025-11-10,"Tech Tower A","Floor 1",948,508,133,6.1
+2025-11-11,"Innovation Lab","Floor 2",1027,520,93,6
+2025-11-13,"Science Block B","Floor 3",1075,422,147,7.9
+2025-11-14,"Admin HQ","Floor 4",1011,398,136,9.3
+2025-11-16,"Student Center","Floor 5",931,534,119,7
+2025-11-17,"Tech Tower A","Floor 1",1084,489,139,7.7
+2025-11-18,"Innovation Lab","Floor 2",1048,436,136,7.6
+2025-11-20,"Science Block B","Floor 3",1067,440,123,8.2
+2025-11-21,"Admin HQ","Floor 4",826,396,105,9.3
+2025-11-23,"Student Center","Floor 5",1068,575,111,7.6
+2025-11-24,"Tech Tower A","Floor 1",847,309,141,8.8
+2025-11-26,"Innovation Lab","Floor 2",880,517,137,9.1
+2025-11-27,"Science Block B","Floor 3",984,449,140,6.8
+2025-11-29,"Admin HQ","Floor 4",916,449,142,9.4
+2025-11-30,"Student Center","Floor 5",852,473,110,8.8
+2025-12-01,"Tech Tower A","Floor 1",822,400,84,13.6
+2025-12-03,"Innovation Lab","Floor 2",724,318,104,12.1
+2025-12-04,"Science Block B","Floor 3",787,448,67,11.6
+2025-12-06,"Admin HQ","Floor 4",642,316,89,12.8
+2025-12-08,"Student Center","Floor 5",682,260,75,13.7
+2025-12-09,"Tech Tower A","Floor 1",922,492,81,12
+2025-12-10,"Innovation Lab","Floor 2",919,518,104,12.2
+2025-12-12,"Science Block B","Floor 3",941,523,96,12.1
+2025-12-13,"Admin HQ","Floor 4",962,346,81,10.3
+2025-12-15,"Student Center","Floor 5",879,412,51,13.2
+2025-12-16,"Tech Tower A","Floor 1",893,535,50,11.7
+2025-12-18,"Innovation Lab","Floor 2",752,445,46,12.6
+2025-12-19,"Science Block B","Floor 3",918,389,69,10.7
+2025-12-20,"Admin HQ","Floor 4",853,392,103,13.1
+2025-12-22,"Student Center","Floor 5",685,351,85,12.4
+2025-12-24,"Tech Tower A","Floor 1",711,314,52,13.5
+2025-12-25,"Innovation Lab","Floor 2",774,271,103,11.7
+2025-12-26,"Science Block B","Floor 3",912,425,90,10.6
+2025-12-28,"Admin HQ","Floor 4",987,443,87,10.7
+2025-12-29,"Student Center","Floor 5",841,476,85,12.6
