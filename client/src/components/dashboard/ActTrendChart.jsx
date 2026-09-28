@@ -6,7 +6,7 @@ import { parseNumericValue, parseDateValue } from '../../utils/csvHelpers';
 export function ActTrendChart({ data = [], trendInfo }) {
   if (!trendInfo || !data.length) return null;
 
-  const { dateCol, numCol, dateFormat, peak, trough } = trendInfo;
+  const { dateCol, numCol, dateFormat, peak, trough, forecast = [] } = trendInfo;
 
   const chartData = useMemo(() => {
     const sorted = [...data]
@@ -18,13 +18,26 @@ export function ActTrendChart({ data = [], trendInfo }) {
       });
 
     const step = Math.max(1, Math.floor(sorted.length / 60));
-    return sorted.filter((_, i) => i % step === 0).map((r) => ({
+    const historical = sorted.filter((_, i) => i % step === 0).map((r) => ({
       name: String(r[dateCol]),
       val: parseNumericValue(r[numCol]) || 0,
       isPeak: String(r[dateCol]) === peak?.date,
       isTrough: String(r[dateCol]) === trough?.date
     }));
-  }, [data, dateCol, numCol, dateFormat, peak, trough]);
+
+    if (!forecast.length || !historical.length) return historical;
+
+    // "Bridge" point carries both val and forecastVal so the dashed
+    // projection visually connects to exactly where the solid line ends,
+    // rather than leaving a gap.
+    const bridged = [
+      ...historical.slice(0, -1),
+      { ...historical[historical.length - 1], forecastVal: historical[historical.length - 1].val }
+    ];
+    const projected = forecast.map((f) => ({ name: f.date, forecastVal: f.value, isForecast: true }));
+
+    return [...bridged, ...projected];
+  }, [data, dateCol, numCol, dateFormat, peak, trough, forecast]);
 
   return (
     <div className="p-8 sm:p-10 bg-white border border-[#161513]/10 rounded-[24px] shadow-sm">
@@ -35,6 +48,11 @@ export function ActTrendChart({ data = [], trendInfo }) {
           </h4>
           <p className="font-mono text-xs text-[#6f6a62] uppercase tracking-wider mt-1">
             Timeline trajectory over {chartData.length} data points
+            {forecast.length > 0 && (
+              <span className="ml-2 text-[#9b958c]">
+                · dashed line is a simple linear projection, not a guaranteed forecast
+              </span>
+            )}
           </p>
         </div>
 
@@ -82,12 +100,20 @@ export function ActTrendChart({ data = [], trendInfo }) {
             <Tooltip
               content={({ active, payload, label }) => {
                 if (!active || !payload || !payload.length) return null;
-                const d = payload[0].payload;
+                const entry = payload.find((p) => typeof p.value === 'number');
+                if (!entry) return null;
+                const d = entry.payload;
+                const isForecast = entry.dataKey === 'forecastVal' && d.isForecast;
                 return (
                   <div className="bg-white border border-[#161513]/15 p-3.5 rounded-[12px] shadow-lg text-xs font-sans">
-                    <p className="font-mono font-semibold text-[#161513] mb-1">{label}</p>
+                    <p className="font-mono font-semibold text-[#161513] mb-1 flex items-center gap-1.5">
+                      {label}
+                      {isForecast && (
+                        <span className="text-[9px] uppercase tracking-wider text-[#9b958c] font-normal">(Forecast)</span>
+                      )}
+                    </p>
                     <p className="font-mono text-[#b5470b] font-bold">
-                      {formatColName(numCol)}: {payload[0].value.toLocaleString()}
+                      {formatColName(numCol)}: {entry.value.toLocaleString()}
                     </p>
                     {d.isPeak && <p className="text-[10px] text-[#b5470b] font-mono font-semibold mt-1">★ PEAK VALUE</p>}
                     {d.isTrough && <p className="text-[10px] text-[#6f6a62] font-mono font-semibold mt-1">▼ LOWEST TROUGH</p>}
@@ -104,6 +130,17 @@ export function ActTrendChart({ data = [], trendInfo }) {
               fill="url(#trendGrad)"
               animationDuration={1200}
             />
+            {forecast.length > 0 && (
+              <Area
+                type="monotone"
+                dataKey="forecastVal"
+                stroke="#b5470b"
+                strokeWidth={2}
+                strokeDasharray="6 5"
+                fillOpacity={0}
+                animationDuration={1200}
+              />
+            )}
           </AreaChart>
         </ResponsiveContainer>
       </div>

@@ -167,6 +167,34 @@ function buildTrend(data, dateCol, numCol, dateFormat) {
 
   const narrativeText = `<span class="font-bold text-[#161513]">${escapeHtml(formatColName(numCol))}</span> trended <span class="font-bold text-[#b5470b]">${direction}</span> over this period. It peaked at <span class="font-bold text-[#b5470b]">${peakVal}</span> on <span class="font-bold text-[#161513]">${escapeHtml(peakDate)}</span> and hit its lowest at <span class="font-bold text-[#6f6a62]">${troughVal}</span> on <span class="font-bold text-[#161513]">${escapeHtml(troughDate)}</span>.`;
 
+  // Basic forecast: project the same least-squares line (already computed
+  // for `slope`/`direction`) forward a few periods, spaced at the dataset's
+  // own average interval between dates. Deliberately simple (linear
+  // extrapolation, not a real time-series model) — presented as a rough
+  // projection, not a prediction.
+  const FORECAST_STEPS = 5;
+  let forecast = [];
+  const validDates = sorted.map((r) => parseDateValue(r[dateCol], dateFormat)).filter(Boolean);
+  if (validDates.length >= 2) {
+    const n = sorted.length;
+    const meanX = (n - 1) / 2;
+    const meanY = sorted.reduce((sum, r) => sum + parseNumericValue(r[numCol]), 0) / n;
+    const avgIntervalMs = (validDates[validDates.length - 1].getTime() - validDates[0].getTime()) / (validDates.length - 1);
+    const lastDateMs = validDates[validDates.length - 1].getTime();
+
+    if (avgIntervalMs > 0) {
+      forecast = Array.from({ length: FORECAST_STEPS }, (_, i) => {
+        const h = i + 1;
+        const projectedIndex = n - 1 + h;
+        const projectedValue = meanY + slope * (projectedIndex - meanX);
+        return {
+          date: new Date(lastDateMs + avgIntervalMs * h).toISOString().slice(0, 10),
+          value: Number(projectedValue.toFixed(2))
+        };
+      });
+    }
+  }
+
   return {
     heading: 'The Big Trend',
     narrative: narrativeText,
@@ -175,7 +203,8 @@ function buildTrend(data, dateCol, numCol, dateFormat) {
     dateFormat,
     direction,
     peak: { value: peakVal, rawValue: parseNumericValue(peak[numCol]), date: peakDate, row: peak },
-    trough: { value: troughVal, rawValue: parseNumericValue(trough[numCol]), date: troughDate, row: trough }
+    trough: { value: troughVal, rawValue: parseNumericValue(trough[numCol]), date: troughDate, row: trough },
+    forecast
   };
 }
 
@@ -283,6 +312,37 @@ function buildStandouts(data, numCol, categoryCol, dateCol) {
 
   const narrativeText = `The highest <span class="font-bold text-[#161513]">${escapeHtml(formatColName(numCol))}</span> recorded was <span class="font-bold text-[#b5470b]">${formatNumberValue(topVal)}</span>${topContext ? ` (${topContext})` : ''}. The lowest was <span class="font-bold text-[#6f6a62]">${formatNumberValue(bottomVal)}</span>${bottomContext ? ` (${bottomContext})` : ''} — a <span class="font-bold text-[#b5470b]">${gapPercent}%</span> gap.`;
 
+  // Anomaly detection: records more than 2 standard deviations from the
+  // mean. This is a distinct signal from top5/bottom5 — an outlier can sit
+  // in the middle of the value range and still be "unusual" relative to
+  // how tightly the rest of the data clusters, which a simple min/max
+  // ranking can't surface.
+  const allVals = valid.map((r) => parseNumericValue(r[numCol]));
+  const mean = allVals.reduce((a, b) => a + b, 0) / allVals.length;
+  const variance = allVals.reduce((a, b) => a + Math.pow(b - mean, 2), 0) / allVals.length;
+  const stdDev = Math.sqrt(variance);
+
+  const anomalies = stdDev > 0
+    ? valid
+        .map((row) => {
+          const val = parseNumericValue(row[numCol]);
+          return { row, val, z: (val - mean) / stdDev };
+        })
+        .filter((x) => Math.abs(x.z) > 2)
+        .sort((a, b) => Math.abs(b.z) - Math.abs(a.z))
+        .slice(0, 10)
+        .map((x) => ({
+          value: formatNumberValue(x.val),
+          zScore: Number(x.z.toFixed(1)),
+          category: categoryCol && x.row[categoryCol] !== null && x.row[categoryCol] !== undefined && x.row[categoryCol] !== ''
+            ? String(x.row[categoryCol])
+            : null,
+          date: dateCol && x.row[dateCol] !== null && x.row[dateCol] !== undefined && x.row[dateCol] !== ''
+            ? String(x.row[dateCol])
+            : null
+        }))
+    : [];
+
   return {
     heading: 'What Stands Out',
     narrative: narrativeText,
@@ -291,6 +351,7 @@ function buildStandouts(data, numCol, categoryCol, dateCol) {
     dateCol,
     top5,
     bottom5,
-    gapPercent
+    gapPercent,
+    anomalies
   };
 }

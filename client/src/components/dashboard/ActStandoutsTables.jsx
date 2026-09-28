@@ -1,4 +1,5 @@
 import React from 'react';
+import { AlertTriangle } from 'lucide-react';
 import { formatColName, formatNumberValue } from '../../utils/smartDetector';
 import { parseNumericValue } from '../../utils/csvHelpers';
 
@@ -11,10 +12,11 @@ function labelOrNull(val) {
 export function ActStandoutsTables({ standoutsInfo }) {
   if (!standoutsInfo || !standoutsInfo.top5) return null;
 
-  const { top5, bottom5, numCol, categoryCol, dateCol } = standoutsInfo;
+  const { top5, bottom5, numCol, categoryCol, dateCol, anomalies = [] } = standoutsInfo;
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 font-sans">
+    <div className="space-y-6 font-sans">
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
       
       {/* Top 5 Peak Records Table */}
       <div className="p-8 bg-emerald-50/50 border border-emerald-200/60 rounded-[24px] shadow-sm">
@@ -94,6 +96,41 @@ export function ActStandoutsTables({ standoutsInfo }) {
         </div>
       </div>
 
+    </div>
+
+    {/* Statistical anomalies: records more than 2 std devs from the mean —
+        a different signal than top5/bottom5, since an outlier can sit
+        mid-range and still be unusual relative to how tightly the rest of
+        the data clusters. */}
+    {anomalies.length > 0 && (
+      <div className="p-6 bg-amber-50/50 border border-amber-200/60 rounded-[20px]">
+        <div className="flex items-center gap-2 mb-4 pb-3 border-b border-amber-200/60">
+          <AlertTriangle className="w-4 h-4 text-amber-700" />
+          <h4 className="font-serif text-xl text-amber-950 font-normal">Unusual Records</h4>
+          <span className="font-mono text-[10px] uppercase text-amber-700/70 tracking-wider">
+            &gt;2 std devs from the mean
+          </span>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
+          {anomalies.map((a, idx) => (
+            <div
+              key={idx}
+              className="flex items-center justify-between p-3 rounded-[10px] bg-white/90 border border-amber-200/50 text-xs font-mono"
+            >
+              <span className="truncate text-[#161513] font-medium">
+                {[a.category, a.date].filter(Boolean).join(' · ') || `Record #${idx + 1}`}
+              </span>
+              <span className="flex items-center gap-1.5 shrink-0 ml-2">
+                <span className="font-bold text-[#161513]">{a.value}</span>
+                <span className={`text-[10px] ${a.zScore > 0 ? 'text-emerald-700' : 'text-red-700'}`}>
+                  ({a.zScore > 0 ? '+' : ''}{a.zScore}σ)
+                </span>
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
+    )}
     </div>
   );
 }
