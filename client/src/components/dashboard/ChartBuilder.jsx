@@ -14,6 +14,7 @@ import {
 } from 'recharts';
 import { DEFAULT_COLORS } from '../../utils/chartPalettes';
 import { formatColName, formatNumberValue } from '../../utils/smartDetector';
+import { parseNumericValue, parseDateValue } from '../../utils/csvHelpers';
 
 // Custom Clean Recharts Tooltip Component
 function CustomTooltip({ active, payload, label }) {
@@ -42,8 +43,10 @@ function CustomTooltip({ active, payload, label }) {
 }
 
 export function ChartBuilder({ chart1Config, chart2Config, chart3Config, rows = [], meta = {}, displayColumns = [] }) {
-  const { numericCols = [], categoricalCols = [], dateCol = null } = meta || {};
-  const allColumns = meta?.types ? Object.keys(meta.types) : (rows[0] ? Object.keys(rows[0]) : []);
+  const { numericCols = [], categoricalCols = [], dateCol = null, dateFormat = null } = meta || {};
+  const allColumns = meta?.types
+    ? Object.keys(meta.types).filter((c) => meta.types[c] !== 'empty')
+    : (rows[0] ? Object.keys(rows[0]) : []);
   
   // Use enabled displayColumns from sidebar attribute filter if provided
   const availableCols = displayColumns.length > 0 ? displayColumns : allColumns;
@@ -74,7 +77,7 @@ export function ChartBuilder({ chart1Config, chart2Config, chart3Config, rows = 
     rows.forEach((r) => {
       const rawVal = r[activeC1X];
       const key = rawVal !== undefined && rawVal !== null && rawVal !== '' ? String(rawVal).trim() : 'Other';
-      const val = activeC1Y === 'Count' ? 1 : (Number(r[activeC1Y]) || 0);
+      const val = activeC1Y === 'Count' ? 1 : (parseNumericValue(r[activeC1Y]) || 0);
       map[key] = (map[key] || 0) + val;
     });
 
@@ -92,7 +95,11 @@ export function ChartBuilder({ chart1Config, chart2Config, chart3Config, rows = 
 
     const isXDate = activeC2X === dateCol;
     const sortedRows = [...rows].sort((a, b) => {
-      if (isXDate) return new Date(a[activeC2X]) - new Date(b[activeC2X]);
+      if (isXDate) {
+        const da = parseDateValue(a[activeC2X], dateFormat);
+        const db = parseDateValue(b[activeC2X], dateFormat);
+        return (da ?? new Date(0)) - (db ?? new Date(0));
+      }
       return 0;
     });
 
@@ -101,14 +108,14 @@ export function ChartBuilder({ chart1Config, chart2Config, chart3Config, rows = 
       const sampled = sortedRows.filter((_, i) => i % step === 0);
       return sampled.map((r) => ({
         name: String(r[activeC2X] || '').trim(),
-        [activeC2Y]: Number(r[activeC2Y]) || 0
+        [activeC2Y]: parseNumericValue(r[activeC2Y]) || 0
       }));
     }
 
     const map = {};
     sortedRows.forEach((r) => {
       const key = String(r[activeC2X] || '').trim();
-      const val = activeC2Y === 'Count' ? 1 : (Number(r[activeC2Y]) || 0);
+      const val = activeC2Y === 'Count' ? 1 : (parseNumericValue(r[activeC2Y]) || 0);
       map[key] = (map[key] || 0) + val;
     });
 
@@ -116,7 +123,7 @@ export function ChartBuilder({ chart1Config, chart2Config, chart3Config, rows = 
       name: key,
       [activeC2Y]: Number(val.toFixed(2))
     }));
-  }, [rows, activeC2X, activeC2Y, dateCol]);
+  }, [rows, activeC2X, activeC2Y, dateCol, dateFormat]);
 
   // Multi-metric Data for Chart 3
   const chart3YCols = availableNumericCols.length > 0 ? availableNumericCols.slice(0, 4) : numericCols.slice(0, 4);
@@ -127,7 +134,11 @@ export function ChartBuilder({ chart1Config, chart2Config, chart3Config, rows = 
 
     const isXDate = activeC3X === dateCol;
     const sortedRows = [...rows].sort((a, b) => {
-      if (isXDate) return new Date(a[activeC3X]) - new Date(b[activeC3X]);
+      if (isXDate) {
+        const da = parseDateValue(a[activeC3X], dateFormat);
+        const db = parseDateValue(b[activeC3X], dateFormat);
+        return (da ?? new Date(0)) - (db ?? new Date(0));
+      }
       return 0;
     });
 
@@ -137,11 +148,11 @@ export function ChartBuilder({ chart1Config, chart2Config, chart3Config, rows = 
     return sampled.map((r) => {
       const obj = { name: String(r[activeC3X] || '').trim() };
       chart3YCols.forEach((col) => {
-        obj[col] = Number(r[col]) || 0;
+        obj[col] = parseNumericValue(r[col]) || 0;
       });
       return obj;
     });
-  }, [rows, activeC3X, chart3YCols, dateCol]);
+  }, [rows, activeC3X, chart3YCols, dateCol, dateFormat]);
 
   const gridColor = '#f0f0f0';
   const textColor = '#6b6b6b';

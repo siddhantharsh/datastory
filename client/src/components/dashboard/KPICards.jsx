@@ -1,19 +1,22 @@
 import React, { useEffect, useState } from 'react';
 import { formatNumberValue } from '../../utils/smartDetector';
+import { parseNumericValue } from '../../utils/csvHelpers';
 
 export function KPICards({ kpiConfigs = [], rows = [], meta = {} }) {
   const [displayVals, setDisplayVals] = useState([0, 0, 0, 0]);
 
-  // Compute metric values from filtered rows
+  // Compute metric values from filtered rows. Returns null (rendered as "—")
+  // when a metric has no numeric column to aggregate, rather than silently
+  // falling back to the row count under a misleading Avg/Max/Sum label.
   const computeValue = (config) => {
-    if (!rows || !rows.length) return 0;
+    if (!rows || !rows.length) return config.metricType === 'COUNT' ? 0 : null;
     if (config.metricType === 'COUNT') return rows.length;
 
     const col = config.col;
-    if (!col) return rows.length;
+    if (!col) return null;
 
     const vals = rows
-      .map((r) => Number(r[col]))
+      .map((r) => parseNumericValue(r[col]))
       .filter((v) => !isNaN(v) && v !== null && v !== undefined);
 
     if (!vals.length) return 0;
@@ -46,7 +49,7 @@ export function KPICards({ kpiConfigs = [], rows = [], meta = {} }) {
       const progress = Math.min(1, elapsed / duration);
       const ease = 1 - Math.pow(1 - progress, 3);
 
-      const current = targetVals.map((target) => target * ease);
+      const current = targetVals.map((target) => (target === null ? null : target * ease));
       setDisplayVals(current);
 
       if (progress < 1) {
@@ -64,7 +67,7 @@ export function KPICards({ kpiConfigs = [], rows = [], meta = {} }) {
   const getSparklinePath = (col) => {
     if (!col || !rows || rows.length < 2) return null;
     const sample = rows.slice(-30);
-    const vals = sample.map((r) => Number(r[col])).filter((v) => !isNaN(v));
+    const vals = sample.map((r) => parseNumericValue(r[col])).filter((v) => !isNaN(v));
     if (vals.length < 2) return null;
 
     const min = Math.min(...vals);
@@ -100,7 +103,7 @@ export function KPICards({ kpiConfigs = [], rows = [], meta = {} }) {
               </div>
 
               <div className="font-serif font-normal text-4xl sm:text-5xl text-[#161513] tracking-tight mb-4">
-                {formatNumberValue(val)}
+                {val === null ? '—' : formatNumberValue(val)}
               </div>
             </div>
 

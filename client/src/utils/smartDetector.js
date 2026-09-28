@@ -1,7 +1,7 @@
 // Smart Data Detection Engine for DataStory
 // Automatically classifies dataset columns into Numeric, Categorical, Date, and High-Cardinality text
 
-import { isDateString } from './csvHelpers';
+import { parseNumericValue, detectDateFormat } from './csvHelpers';
 
 export function detectColumnTypes(rows, columns) {
   if (!rows || !rows.length || !columns || !columns.length) {
@@ -9,6 +9,7 @@ export function detectColumnTypes(rows, columns) {
       numericCols: [],
       categoricalCols: [],
       dateCol: null,
+      dateFormat: null,
       highCardCols: [],
       types: {},
       uniqueValuesMap: {}
@@ -18,12 +19,13 @@ export function detectColumnTypes(rows, columns) {
   const sampleSize = Math.min(rows.length, 300);
   const types = {};
   const uniqueValuesMap = {};
+  const dateFormats = {};
 
   columns.forEach((col) => {
     let numericCount = 0;
-    let dateCount = 0;
     let nonNullCount = 0;
     const uniqueVals = new Set();
+    const sampleRaw = [];
 
     for (let i = 0; i < sampleSize; i++) {
       const val = rows[i]?.[col];
@@ -31,27 +33,33 @@ export function detectColumnTypes(rows, columns) {
         nonNullCount++;
         const strVal = String(val).trim();
         uniqueVals.add(strVal);
+        sampleRaw.push(strVal);
 
-        if (typeof val === 'number' || (!isNaN(Number(val)) && typeof val !== 'boolean')) {
+        if (typeof val === 'number' || (!isNaN(parseNumericValue(val)) && typeof val !== 'boolean')) {
           numericCount++;
-        }
-        if (isDateString(strVal)) {
-          dateCount++;
         }
       }
     }
 
     uniqueValuesMap[col] = uniqueVals.size;
 
-    // Classification Rules:
-    // 1. If 75%+ values match date format -> DATE
-    // 2. If < 25 unique values (including discrete numbers like floor: 1,2,3,4 or bus_id) -> CATEGORICAL
-    // 3. If 75%+ continuous numeric values -> NUMERIC
-    // 4. Otherwise -> HIGH CARDINALITY TEXT
+    // A column with no non-empty values at all can't be usefully classified —
+    // exclude it entirely rather than let it show up as a selectable-but-empty
+    // chart axis.
     if (nonNullCount === 0) {
-      types[col] = 'high_cardinality';
-    } else if (dateCount / nonNullCount > 0.7) {
+      types[col] = 'empty';
+      return;
+    }
+
+    // Classification Rules (checked in order):
+    // 1. If 70%+ of values resolve to one consistent date format -> DATE
+    // 2. If < 25 unique values (including discrete numbers like floor: 1,2,3,4 or bus_id) -> CATEGORICAL
+    // 3. If 70%+ continuous numeric values -> NUMERIC
+    // 4. Otherwise -> HIGH CARDINALITY TEXT
+    const resolvedDateFormat = detectDateFormat(sampleRaw);
+    if (resolvedDateFormat) {
       types[col] = 'date';
+      dateFormats[col] = resolvedDateFormat;
     } else if (uniqueVals.size < 25 && uniqueVals.size > 0) {
       // Small number of distinct values = categorical dimension (e.g. floor, department, status, route)
       types[col] = 'categorical';
@@ -72,6 +80,7 @@ export function detectColumnTypes(rows, columns) {
     numericCols,
     categoricalCols,
     dateCol,
+    dateFormat: dateCol ? dateFormats[dateCol] : null,
     highCardCols,
     uniqueValuesMap
   };
@@ -100,19 +109,19 @@ export function generateSmartDashboardConfig(rows, columns) {
     },
     {
       id: 'kpi-avg-1',
-      title: numericCols[0] ? `Avg ${formatColName(numericCols[0])}` : 'Average Metric',
+      title: numericCols[0] ? `Avg ${formatColName(numericCols[0])}` : 'No Numeric Data',
       col: numericCols[0] || null,
       metricType: 'AVG'
     },
     {
       id: 'kpi-max-2',
-      title: numericCols[1] ? `Max ${formatColName(numericCols[1])}` : (numericCols[0] ? `Max ${formatColName(numericCols[0])}` : 'Peak Metric'),
+      title: numericCols[1] ? `Max ${formatColName(numericCols[1])}` : (numericCols[0] ? `Max ${formatColName(numericCols[0])}` : 'No Numeric Data'),
       col: numericCols[1] || numericCols[0] || null,
       metricType: 'MAX'
     },
     {
       id: 'kpi-sum-3',
-      title: numericCols[2] ? `Sum ${formatColName(numericCols[2])}` : (numericCols[0] ? `Sum ${formatColName(numericCols[0])}` : 'Total Sum'),
+      title: numericCols[2] ? `Sum ${formatColName(numericCols[2])}` : (numericCols[0] ? `Sum ${formatColName(numericCols[0])}` : 'No Numeric Data'),
       col: numericCols[2] || numericCols[0] || null,
       metricType: 'SUM'
     }
