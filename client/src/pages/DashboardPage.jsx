@@ -38,6 +38,18 @@ export function DashboardPage({ onBackToHome }) {
   // Visible Columns State for Act 6 (Attribute Filter)
   const [visibleColumns, setVisibleColumns] = useState([]);
 
+  // Manual column-type overrides (Act 7 sidebar) — lets a user correct
+  // auto-detection when it gets a column wrong, rather than being stuck
+  // with whatever the heuristic decided.
+  const [typeOverrides, setTypeOverrides] = useState({});
+  const TYPE_CYCLE = ['numeric', 'categorical', 'date', 'high_cardinality'];
+  const cycleColumnType = (col, currentType) => {
+    const idx = TYPE_CYCLE.indexOf(currentType);
+    const nextType = TYPE_CYCLE[(idx + 1) % TYPE_CYCLE.length];
+    setTypeOverrides((prev) => ({ ...prev, [col]: nextType }));
+  };
+  const resetTypeOverrides = () => setTypeOverrides({});
+
   // Scroll to top resting on Slide 1 on mount or dataset load
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'instant' });
@@ -49,8 +61,8 @@ export function DashboardPage({ onBackToHome }) {
       return null;
     }
     const cols = activeDataset.columns || Object.keys(activeDataset.rows[0]);
-    return generateSmartDashboardConfig(activeDataset.rows, cols);
-  }, [activeDataset]);
+    return generateSmartDashboardConfig(activeDataset.rows, cols, typeOverrides);
+  }, [activeDataset, typeOverrides]);
 
   // Filter rows based on constellation map selection for Acts 3+
   const constellationRows = useMemo(() => {
@@ -76,6 +88,7 @@ export function DashboardPage({ onBackToHome }) {
         numeric: {},
         dateRange: { start: '', end: '' }
       });
+      setTypeOverrides({});
     }
   }, [activeDataset?.id]);
 
@@ -465,22 +478,37 @@ export function DashboardPage({ onBackToHome }) {
                     <div>
                       <div className="flex items-center justify-between mb-2 text-[11px] font-mono uppercase text-[#6f6a62]">
                         <span>Toggle Attributes ({visibleColumns.length}/{allColumns.length})</span>
-                        <button
-                          onClick={() =>
-                            setVisibleColumns(
-                              visibleColumns.length === allColumns.length ? [allColumns[0]] : [...allColumns]
-                            )
-                          }
-                          className="text-[#b5470b] hover:underline cursor-pointer font-semibold"
-                        >
-                          {visibleColumns.length === allColumns.length ? 'Deselect' : 'All'}
-                        </button>
+                        <div className="flex items-center gap-3">
+                          {Object.keys(typeOverrides).length > 0 && (
+                            <button
+                              onClick={resetTypeOverrides}
+                              title="Revert all manual type reassignments back to auto-detected"
+                              className="text-[#9b958c] hover:underline cursor-pointer font-semibold normal-case"
+                            >
+                              Reset types
+                            </button>
+                          )}
+                          <button
+                            onClick={() =>
+                              setVisibleColumns(
+                                visibleColumns.length === allColumns.length ? [allColumns[0]] : [...allColumns]
+                              )
+                            }
+                            className="text-[#b5470b] hover:underline cursor-pointer font-semibold"
+                          >
+                            {visibleColumns.length === allColumns.length ? 'Deselect' : 'All'}
+                          </button>
+                        </div>
                       </div>
+                      <p className="text-[10px] text-[#9b958c] normal-case mb-2 -mt-1">
+                        Click the type icon to reassign a column if auto-detection got it wrong.
+                      </p>
 
                       <div className="space-y-1.5 max-h-72 overflow-y-auto pr-1">
                         {allColumns.map((col) => {
                           const isVisible = visibleColumns.includes(col);
                           const colType = config?.meta?.types?.[col] || 'text';
+                          const isOverridden = typeOverrides[col] !== undefined;
 
                           let TypeIcon = Type;
                           let typeColor = 'text-gray-400';
@@ -515,9 +543,17 @@ export function DashboardPage({ onBackToHome }) {
                                 <span className="truncate font-mono text-[11px] font-medium">{formatColName(col)}</span>
                               </div>
 
-                              <span title={`Detected Type: ${colType}`} className="ml-1 shrink-0">
+                              <button
+                                type="button"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  cycleColumnType(col, colType);
+                                }}
+                                title={`${isOverridden ? 'Manually set to' : 'Detected as'} "${colType}" — click to reassign`}
+                                className={`ml-1 shrink-0 p-0.5 rounded hover:bg-white cursor-pointer ${isOverridden ? 'ring-1 ring-[#b5470b]/50' : ''}`}
+                              >
                                 <TypeIcon className={`w-3 h-3 ${typeColor}`} />
-                              </span>
+                              </button>
                             </div>
                           );
                         })}

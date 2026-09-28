@@ -3,7 +3,7 @@
 
 import { parseNumericValue, detectDateFormat } from './csvHelpers';
 
-export function detectColumnTypes(rows, columns) {
+export function detectColumnTypes(rows, columns, typeOverrides = {}) {
   if (!rows || !rows.length || !columns || !columns.length) {
     return {
       numericCols: [],
@@ -75,16 +75,29 @@ export function detectColumnTypes(rows, columns) {
     //    (e.g. floor: 1,2,3,4 or bus_id)
     // 3. If 70%+ continuous numeric values -> NUMERIC
     // 4. Otherwise -> HIGH CARDINALITY TEXT
+    // Stored regardless of the classification outcome — if the user manually
+    // overrides this column to "date" below, we still want a best-effort
+    // resolved format for it rather than falling back to an unparsed guess.
     const resolvedDateFormat = detectDateFormat(sampleRaw);
+    dateFormats[col] = resolvedDateFormat;
+
     if (resolvedDateFormat) {
       types[col] = 'date';
-      dateFormats[col] = resolvedDateFormat;
     } else if (uniqueVals.size < 25 && uniqueVals.size > 0 && !isContinuousMeasurement) {
       types[col] = 'categorical';
     } else if (numericRatio > 0.7) {
       types[col] = 'numeric';
     } else {
       types[col] = 'high_cardinality';
+    }
+  });
+
+  // Apply manual per-column type overrides (from the sidebar's "reassign
+  // type" control) after the heuristic pass, so a user's explicit choice
+  // always wins over auto-detection.
+  Object.entries(typeOverrides || {}).forEach(([col, overrideType]) => {
+    if (columns.includes(col) && types[col] !== undefined && types[col] !== 'empty') {
+      types[col] = overrideType;
     }
   });
 
@@ -121,8 +134,8 @@ export function detectColumnTypes(rows, columns) {
   };
 }
 
-export function generateSmartDashboardConfig(rows, columns) {
-  const meta = detectColumnTypes(rows, columns);
+export function generateSmartDashboardConfig(rows, columns, typeOverrides = {}) {
+  const meta = detectColumnTypes(rows, columns, typeOverrides);
   const { numericCols, categoricalCols, dateCol } = meta;
 
   // Fallbacks if numericCols or categoricalCols are empty
