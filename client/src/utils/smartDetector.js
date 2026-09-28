@@ -20,6 +20,7 @@ export function detectColumnTypes(rows, columns) {
   const types = {};
   const uniqueValuesMap = {};
   const dateFormats = {};
+  const nonNullCounts = {};
 
   columns.forEach((col) => {
     let numericCount = 0;
@@ -47,6 +48,7 @@ export function detectColumnTypes(rows, columns) {
     }
 
     uniqueValuesMap[col] = uniqueVals.size;
+    nonNullCounts[col] = nonNullCount;
 
     // A column with no non-empty values at all can't be usefully classified —
     // exclude it entirely rather than let it show up as a selectable-but-empty
@@ -86,7 +88,24 @@ export function detectColumnTypes(rows, columns) {
     }
   });
 
-  const numericCols = columns.filter((c) => types[c] === 'numeric');
+  // A numeric column whose values are (almost) all unique, especially when
+  // its name looks like an identifier ("id", "geonameid", "customer_id"), is
+  // very likely a primary/foreign key rather than a meaningful metric —
+  // summing or averaging it (as the KPI/trend/standouts acts do with
+  // numericCols[0]) produces a technically-correct but meaningless number.
+  // Deprioritize (not exclude) such columns so a real metric is preferred
+  // when one exists, while still leaving the identifier chartable manually.
+  const looksLikeIdName = (col) => /(^|_)id$/i.test(col) || /id$/i.test(col.replace(/[^a-zA-Z]/g, ''));
+  const isLikelyIdentifier = (col) => {
+    const n = nonNullCounts[col] || 0;
+    if (n < 20) return false;
+    const uniquenessRatio = (uniqueValuesMap[col] || 0) / n;
+    return uniquenessRatio > 0.95 && (looksLikeIdName(col) || uniquenessRatio === 1);
+  };
+
+  const numericCols = columns
+    .filter((c) => types[c] === 'numeric')
+    .sort((a, b) => (isLikelyIdentifier(a) ? 1 : 0) - (isLikelyIdentifier(b) ? 1 : 0));
   const categoricalCols = columns.filter((c) => types[c] === 'categorical');
   const dateCol = columns.find((c) => types[c] === 'date') || null;
   const highCardCols = columns.filter((c) => types[c] === 'high_cardinality');
