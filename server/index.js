@@ -2,6 +2,7 @@ require('dotenv').config();
 
 const express = require('express');
 const cors = require('cors');
+const cookieParser = require('cookie-parser');
 const path = require('path');
 const fs = require('fs');
 require('./db'); // Initializes SQLite DB & auto-seeds samples
@@ -16,6 +17,7 @@ const PORT = process.env.PORT || 3001;
 const CLIENT_DIST = path.join(__dirname, '../client/dist');
 
 app.use(cors());
+app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 

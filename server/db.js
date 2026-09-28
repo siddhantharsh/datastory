@@ -33,7 +33,36 @@ db.exec(`
     row_data_json TEXT NOT NULL,
     FOREIGN KEY (dataset_id) REFERENCES datasets(id) ON DELETE CASCADE
   );
+
+  CREATE TABLE IF NOT EXISTS users (
+    id TEXT PRIMARY KEY,
+    email TEXT NOT NULL UNIQUE,
+    password_hash TEXT NOT NULL,
+    display_name TEXT,
+    created_at TEXT NOT NULL
+  );
+
+  CREATE TABLE IF NOT EXISTS dataset_shares (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    dataset_id TEXT NOT NULL,
+    shared_with_user_id TEXT NOT NULL,
+    permission TEXT NOT NULL DEFAULT 'view',
+    created_at TEXT NOT NULL,
+    FOREIGN KEY (dataset_id) REFERENCES datasets(id) ON DELETE CASCADE,
+    FOREIGN KEY (shared_with_user_id) REFERENCES users(id) ON DELETE CASCADE,
+    UNIQUE (dataset_id, shared_with_user_id)
+  );
 `);
+
+// Migration: datasets predates per-user ownership, so existing production
+// rows don't have an owner_id column yet. NULL owner_id is the "public"
+// bucket (the 3 bundled samples, and anything uploaded before this change) —
+// nothing existing gets hidden or reassigned by adding the column.
+const datasetColumns = db.prepare("PRAGMA table_info(datasets)").all().map((c) => c.name);
+if (!datasetColumns.includes('owner_id')) {
+  db.exec('ALTER TABLE datasets ADD COLUMN owner_id TEXT');
+  console.log('Migrated datasets table: added owner_id column');
+}
 
 console.log('Database initialized successfully at:', dbPath);
 
