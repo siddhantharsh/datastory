@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from '../ui/Button';
 import { UploadModal } from '../ui/UploadModal';
-import { EditorAccessControl } from '../ui/EditorAccessControl';
+import { AuthControl } from '../ui/AuthControl';
 import { Upload, ArrowRight, BarChart2, Moon, Sun } from 'lucide-react';
 import { useDataset } from '../../context/DatasetContext';
 import { useDarkMode } from '../../hooks/useDarkMode';
 
 export function Navbar({ currentPage, setCurrentPage }) {
-  const { datasets, activeDataset, selectDataset, isEditor } = useDataset();
+  const { datasets, activeDataset, selectDataset, user } = useDataset();
   const [isUploadOpen, setIsUploadOpen] = useState(false);
   const [isDark, setIsDark] = useDarkMode(currentPage === 'dashboard');
   const [scrollProgress, setScrollProgress] = useState(0);
@@ -98,8 +98,8 @@ export function Navbar({ currentPage, setCurrentPage }) {
                 >
                   {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
                 </button>
-                <EditorAccessControl />
-                {isEditor && (
+                <AuthControl />
+                {user && (
                   <Button
                     variant="outline"
                     size="sm"

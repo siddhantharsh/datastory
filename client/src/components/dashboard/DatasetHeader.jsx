@@ -1,14 +1,17 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useDataset } from '../../context/DatasetContext';
 import { UploadModal } from '../ui/UploadModal';
-import { Database, Upload, Trash2, FileSpreadsheet, ArrowLeft, Download, ChevronDown, FileCode, Table, Link2, Check } from 'lucide-react';
+import { ShareModal } from '../ui/ShareModal';
+import { Database, Upload, Trash2, FileSpreadsheet, ArrowLeft, Download, ChevronDown, FileCode, Table, Link2, Check, Share2 } from 'lucide-react';
 
 export function DatasetHeader({ onBackToHome, filteredRows = [] }) {
-  const { datasets, activeDataset, selectDataset, deleteDataset, loading, isEditor } = useDataset();
+  const { datasets, activeDataset, selectDataset, deleteDataset, loading, user } = useDataset();
   const [isUploadOpen, setIsUploadOpen] = useState(false);
   const [isExportOpen, setIsExportOpen] = useState(false);
+  const [isShareOpen, setIsShareOpen] = useState(false);
   const [linkCopied, setLinkCopied] = useState(false);
   const exportRef = useRef(null);
+  const isOwner = activeDataset?.access === 'owner';
 
   // The URL is kept in sync with the active dataset + filters/columns/type
   // overrides by DashboardPage as the user interacts, so copying it here
@@ -139,15 +142,35 @@ export function DatasetHeader({ onBackToHome, filteredRows = [] }) {
               onChange={(e) => selectDataset(e.target.value)}
               className="bg-transparent text-xs font-mono font-semibold text-[var(--ink)] focus:outline-none cursor-pointer pr-2"
             >
-              {datasets.map((d) => (
-                <option key={d.id} value={d.id} className="bg-white font-sans text-xs">
-                  {d.name} ({d.row_count || d.rowCount} rows)
-                </option>
-              ))}
+              <optgroup label="Samples">
+                {datasets.filter((d) => d.access === 'public').map((d) => (
+                  <option key={d.id} value={d.id} className="bg-white font-sans text-xs">
+                    {d.name} ({d.row_count || d.rowCount} rows)
+                  </option>
+                ))}
+              </optgroup>
+              {datasets.some((d) => d.access === 'owner') && (
+                <optgroup label="Yours">
+                  {datasets.filter((d) => d.access === 'owner').map((d) => (
+                    <option key={d.id} value={d.id} className="bg-white font-sans text-xs">
+                      {d.name} ({d.row_count || d.rowCount} rows)
+                    </option>
+                  ))}
+                </optgroup>
+              )}
+              {datasets.some((d) => d.access === 'shared') && (
+                <optgroup label="Shared with you">
+                  {datasets.filter((d) => d.access === 'shared').map((d) => (
+                    <option key={d.id} value={d.id} className="bg-white font-sans text-xs">
+                      {d.name} ({d.row_count || d.rowCount} rows)
+                    </option>
+                  ))}
+                </optgroup>
+              )}
             </select>
           </div>
 
-          {isEditor && (
+          {user && (
             <button
               onClick={() => setIsUploadOpen(true)}
               className="inline-flex items-center gap-2 px-4 py-2.5 rounded-[12px] border border-[var(--ink)]/15 bg-white text-xs font-sans font-medium text-[var(--ink)] hover:bg-[var(--bg)] transition-all cursor-pointer"
@@ -222,12 +245,22 @@ export function DatasetHeader({ onBackToHome, filteredRows = [] }) {
             )}
           </div>
 
-          {isEditor && activeDataset && !activeDataset.isSample && (
+          {user && isOwner && (
+            <button
+              onClick={() => setIsShareOpen(true)}
+              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-[12px] border border-[var(--ink)]/15 bg-white text-xs font-sans font-medium text-[var(--ink)] hover:bg-[var(--bg)] transition-all cursor-pointer"
+            >
+              <Share2 className="w-4 h-4 text-[#b5470b]" />
+              <span>Share</span>
+            </button>
+          )}
+
+          {user && isOwner && (
             <button
               className="p-2.5 text-red-600 hover:bg-red-50 rounded-[12px] border border-red-200 transition-colors cursor-pointer"
-              title="Delete custom dataset"
+              title="Delete this dataset"
               onClick={() => {
-                if (window.confirm(`Delete custom dataset "${activeDataset.name}"?`)) {
+                if (window.confirm(`Delete dataset "${activeDataset.name}"?`)) {
                   deleteDataset(activeDataset.id);
                 }
               }}
@@ -239,6 +272,14 @@ export function DatasetHeader({ onBackToHome, filteredRows = [] }) {
       </div>
 
       <UploadModal isOpen={isUploadOpen} onClose={() => setIsUploadOpen(false)} />
+      {isOwner && (
+        <ShareModal
+          isOpen={isShareOpen}
+          onClose={() => setIsShareOpen(false)}
+          datasetId={activeDataset?.id}
+          datasetName={activeDataset?.name}
+        />
+      )}
     </>
   );
 }

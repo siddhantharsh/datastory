@@ -2,8 +2,6 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 
 const DatasetContext = createContext();
 
-const EDITOR_TOKEN_KEY = 'datastory_editor_token';
-
 export function DatasetProvider({ children }) {
   const [datasets, setDatasets] = useState([]);
   const [activeDataset, setActiveDataset] = useState(null);
@@ -12,34 +10,57 @@ export function DatasetProvider({ children }) {
 
   const [constellationFilter, setConstellationFilter] = useState(null);
 
-  // Lightweight Editor/Viewer role gate — see server/auth.js. The token is
-  // only meaningful if the server (still) recognizes it; a redeploy/restart
-  // regenerates the server's token, so a stale local one is simply rejected
-  // on the next mutating request (surfaced as a normal 403 error).
-  const [editorToken, setEditorToken] = useState(() => localStorage.getItem(EDITOR_TOKEN_KEY));
-  const isEditor = Boolean(editorToken);
+  // Real per-user auth — the session lives in an httpOnly cookie the browser
+  // sends automatically, so the client never touches a token directly; `user`
+  // is just a cache of GET /api/auth/me, re-fetched after login/signup/logout.
+  const [user, setUser] = useState(null);
+  const [authChecked, setAuthChecked] = useState(false);
 
-  const loginAsEditor = async (passcode) => {
+  const fetchMe = async () => {
+    try {
+      const res = await fetch('/api/auth/me');
+      setUser(res.ok ? (await res.json()).user : null);
+    } catch {
+      setUser(null);
+    } finally {
+      setAuthChecked(true);
+    }
+  };
+
+  const signup = async (email, password, displayName) => {
+    const res = await fetch('/api/auth/signup', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password, displayName })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Signup failed');
+    setUser(data.user);
+    await fetchDatasets();
+    return data.user;
+  };
+
+  const login = async (email, password) => {
     const res = await fetch('/api/auth/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ passcode })
+      body: JSON.stringify({ email, password })
     });
-    if (!res.ok) {
-      const errData = await res.json();
-      throw new Error(errData.error || 'Login failed');
-    }
-    const { token } = await res.json();
-    localStorage.setItem(EDITOR_TOKEN_KEY, token);
-    setEditorToken(token);
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Login failed');
+    setUser(data.user);
+    await fetchDatasets();
+    return data.user;
   };
 
-  const logoutEditor = () => {
-    localStorage.removeItem(EDITOR_TOKEN_KEY);
-    setEditorToken(null);
+  const logout = async () => {
+    await fetch('/api/auth/logout', { method: 'POST' });
+    setUser(null);
+    await fetchDatasets();
   };
 
-  // Fetch list of datasets on mount
+  // Fetch list of datasets visible to the current viewer (public + owned +
+  // shared-with-them — the server does the access filtering, not the client).
   const fetchDatasets = async () => {
     try {
       setLoading(true);
@@ -49,10 +70,15 @@ export function DatasetProvider({ children }) {
       const data = await res.json();
       setDatasets(data);
 
-      // Auto-select first dataset if none selected
-      if (data.length > 0 && !activeDataset) {
-        await selectDataset(data[0].id);
-      }
+      setActiveDataset((prevActive) => {
+        if (prevActive && data.some((d) => d.id === prevActive.id)) {
+          return prevActive; // still visible/valid, keep it (avoids a reselect flicker)
+        }
+        if (data.length > 0) {
+          selectDataset(data[0].id); // fire and forget — updates activeDataset once loaded
+        }
+        return prevActive && data.length > 0 ? prevActive : null;
+      });
     } catch (err) {
       console.error('Fetch Datasets Error:', err);
       setError(err.message);
@@ -67,7 +93,10 @@ export function DatasetProvider({ children }) {
       setLoading(true);
       setError(null);
       const res = await fetch(`/api/datasets/${id}`);
-      if (!res.ok) throw new Error('Failed to load dataset details');
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        throw new Error(errData.error || 'Failed to load dataset details');
+      }
       const dataset = await res.json();
       setActiveDataset(dataset);
       return dataset;
@@ -79,7 +108,7 @@ export function DatasetProvider({ children }) {
     }
   };
 
-  // Upload custom CSV file
+  // Upload a CSV/Excel file (requires login — the server enforces this too)
   const uploadDataset = async (file, customName) => {
     try {
       setLoading(true);
@@ -89,11 +118,7 @@ export function DatasetProvider({ children }) {
       formData.append('file', file);
       if (customName) formData.append('name', customName);
 
-      const res = await fetch('/api/upload', {
-        method: 'POST',
-        headers: editorToken ? { 'X-Editor-Token': editorToken } : {},
-        body: formData
-      });
+      const res = await fetch('/api/upload', { method: 'POST', body: formData });
 
       if (!res.ok) {
         const errData = await res.json();
@@ -103,7 +128,6 @@ export function DatasetProvider({ children }) {
       const result = await res.json();
       const newDataset = result.dataset;
 
-      // Update datasets list
       setDatasets((prev) => [
         {
           id: newDataset.id,
@@ -113,12 +137,12 @@ export function DatasetProvider({ children }) {
           col_count: newDataset.colCount,
           columns: newDataset.columns,
           created_at: newDataset.createdAt,
-          isSample: false
+          isSample: false,
+          access: 'owner'
         },
         ...prev
       ]);
 
-      // Set as active dataset
       setActiveDataset(newDataset);
       return { ...newDataset, warnings: result.warnings || [] };
     } catch (err) {
@@ -130,14 +154,11 @@ export function DatasetProvider({ children }) {
     }
   };
 
-  // Delete custom dataset
+  // Delete a dataset you own
   const deleteDataset = async (id) => {
     try {
       setLoading(true);
-      const res = await fetch(`/api/datasets/${id}`, {
-        method: 'DELETE',
-        headers: editorToken ? { 'X-Editor-Token': editorToken } : {}
-      });
+      const res = await fetch(`/api/datasets/${id}`, { method: 'DELETE' });
       if (!res.ok) {
         const errData = await res.json();
         throw new Error(errData.error || 'Failed to delete dataset');
@@ -161,8 +182,35 @@ export function DatasetProvider({ children }) {
     }
   };
 
+  // Grant another registered user view access to a dataset you own
+  const shareDataset = async (id, email) => {
+    const res = await fetch(`/api/datasets/${id}/share`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Failed to share dataset');
+    return data;
+  };
+
+  const getDatasetShares = async (id) => {
+    const res = await fetch(`/api/datasets/${id}/shares`);
+    if (!res.ok) throw new Error('Failed to load share list');
+    return res.json();
+  };
+
+  const revokeDatasetShare = async (id, userId) => {
+    const res = await fetch(`/api/datasets/${id}/shares/${userId}`, { method: 'DELETE' });
+    if (!res.ok) throw new Error('Failed to revoke access');
+    return res.json();
+  };
+
   useEffect(() => {
-    fetchDatasets();
+    (async () => {
+      await fetchMe();
+      await fetchDatasets();
+    })();
   }, []);
 
   return (
@@ -176,11 +224,16 @@ export function DatasetProvider({ children }) {
         selectDataset,
         uploadDataset,
         deleteDataset,
+        shareDataset,
+        getDatasetShares,
+        revokeDatasetShare,
         constellationFilter,
         setConstellationFilter,
-        isEditor,
-        loginAsEditor,
-        logoutEditor
+        user,
+        authChecked,
+        signup,
+        login,
+        logout
       }}
     >
       {children}

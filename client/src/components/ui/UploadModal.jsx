@@ -5,6 +5,7 @@ import { UploadCloud, FileText, CheckCircle2, AlertCircle } from 'lucide-react';
 import { useDataset } from '../../context/DatasetContext';
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // must match server/routes/upload.js's multer limit
+const ACCEPTED_EXTENSIONS = ['.csv', '.xlsx', '.xls'];
 
 export function UploadModal({ isOpen, onClose, onSuccess }) {
   const { uploadDataset } = useDataset();
@@ -16,8 +17,19 @@ export function UploadModal({ isOpen, onClose, onSuccess }) {
   const [warnings, setWarnings] = useState(null);
 
   const acceptFile = (candidate) => {
-    if (!(candidate.type === 'text/csv' || candidate.name.endsWith('.csv'))) {
-      setError('Please select a valid CSV file.');
+    const ext = '.' + candidate.name.split('.').pop().toLowerCase();
+
+    if (ext === '.numbers') {
+      // Apple Numbers has no viable Node.js parser — give the redirect
+      // immediately, client-side, rather than a round-trip to find out.
+      setError(
+        'Numbers files aren’t directly supported — export as CSV or Excel from ' +
+        'Numbers (File → Export To) and upload that instead.'
+      );
+      return;
+    }
+    if (!ACCEPTED_EXTENSIONS.includes(ext)) {
+      setError('Please select a CSV or Excel (.xlsx/.xls) file.');
       return;
     }
     if (candidate.size > MAX_FILE_SIZE) {
@@ -25,7 +37,7 @@ export function UploadModal({ isOpen, onClose, onSuccess }) {
       return;
     }
     setFile(candidate);
-    setDatasetName(candidate.name.replace(/\.csv$/i, ''));
+    setDatasetName(candidate.name.replace(/\.(csv|xlsx|xls)$/i, ''));
     setError(null);
   };
 
@@ -123,7 +135,7 @@ export function UploadModal({ isOpen, onClose, onSuccess }) {
           <input
             id="csv-file-input"
             type="file"
-            accept=".csv"
+            accept=".csv,.xlsx,.xls,.numbers"
             onChange={handleFileChange}
             className="hidden"
           />
@@ -142,7 +154,7 @@ export function UploadModal({ isOpen, onClose, onSuccess }) {
               <p className="font-medium text-[#1a1a1a] text-sm">
                 Drag and drop your CSV file here, or <span className="text-[#2563eb] underline">browse</span>
               </p>
-              <p className="text-xs text-[#6b6b6b]">Supports standard CSV files up to 10MB</p>
+              <p className="text-xs text-[#6b6b6b]">Supports CSV and Excel (.xlsx/.xls) files up to 10MB</p>
             </div>
           )}
         </div>
