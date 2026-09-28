@@ -16,8 +16,8 @@ server/   Express 5 + better-sqlite3 (the only persistence layer — no Mongo/Po
 sample-datasets/   3 synthetic CSVs (attendance/transport/energy), auto-seeded into SQLite on boot
 ```
 
-- **No auth, no user accounts** — out of scope for a 2-day hackathon demo. Anyone hitting the
-  API can upload/view/export/delete any (non-sample) dataset.
+- **Lightweight Editor/Viewer role gate** (`server/auth.js`) — everyone can browse/filter/export;
+  a passcode unlocks Editor mode (upload/delete), enforced server-side. See "Features" below.
 - **No React Router** — `client/src/App.jsx` toggles between `landing` and `dashboard` with a
   single `useState`; no deep-linking.
 - **State**: one React Context, `client/src/context/DatasetContext.jsx` — holds the active
@@ -49,7 +49,9 @@ npm run dev:client    # Vite dev server on :5173, proxies /api -> :3001
 ```
 
 Open `http://localhost:5173`. `server/data.db` and `server/uploads/` are created on disk and are
-git-ignored (see "Repo hygiene" below).
+git-ignored (see "Repo hygiene" below). To upload/delete datasets, click the "Viewer" badge in the
+dashboard nav and enter the Editor passcode (`hackathon2026` by default, or your `EDITOR_PASSCODE`
+env var — see "Features").
 
 ## Repo hygiene notes
 
@@ -89,6 +91,30 @@ Known, intentionally deferred: non-UTF-8 (e.g. Windows-1252) file encoding isn't
 cosmetic mojibake risk on a minority of exports, not a structural one, and fixing it needs a new
 dependency for low marginal value in a hackathon-scoped app.
 
+**Extended bug bash** (second pass, against real public datasets — Titanic, Apple stock history,
+Gapminder, Iris, a 34k-row world-cities file, a 62k-row NBA game log, and others — not just
+synthetic test CSVs) found four more real issues, all fixed:
+- A 0/1-coded categorical column (e.g. Titanic's `survived`) was mislabeled "Other" and
+  undercounted in the overview, because several places used `value || 'fallback'` /
+  `.filter(Boolean)`, and `0` is falsy in JS. Fixed to check explicitly for
+  null/undefined/empty-string instead of truthiness.
+- Three chart components (`ActTrendChart`, `ActComparisonChart`, `ActStandoutsTables`)
+  independently re-derived chart data from raw rows with bare `Number()`/`new Date()`, bypassing
+  the shared parsers — a currency-formatted column showed correct narrative text but a
+  flat/NaN chart underneath it. Now use `parseNumericValue`/`parseDateValue` too.
+- Continuous decimal measurements with naturally low unique-value counts (e.g. Iris's
+  `sepal_width`, ~23 distinct values across 150 rows) were misclassified as categorical by the
+  "<25 unique values" rule (meant for near-integer dimensions like floor number or rating).
+  `smartDetector.js` now exempts columns that are mostly non-integer decimals from that rule.
+  Also: `layoutTimeline` in `formations.js` and the Particle Swarm's hover tooltip re-parsed dates
+  with a raw `new Date()`, bypassing the resolved date format (same class of bug as above); and
+  `DataTableExplorer`'s column sort fell back to plain string comparison for anything that wasn't
+  a native `number`, so a currency-formatted or non-ISO-date column sorted in the wrong order.
+- A numeric column whose values are almost all unique (a primary/foreign key like `geonameid` or
+  a row-order column) was getting auto-picked as the headline metric to sum/average — technically
+  correct arithmetic, meaningless as an insight. `numericCols` is now stably sorted to deprioritize
+  (not exclude) such columns so a real metric is preferred when one exists.
+
 ## Scroll feel & mobile
 
 - **Scroll feel**: Lenis's smoothing (`useLenis.js`) was tuned down from a 1.2s expo-out curve to
@@ -102,6 +128,64 @@ dependency for low marginal value in a hackathon-scoped app.
   it, and the sidebar itself is reordered to render after the charts/table on mobile. The three
   landing-page GSAP pinned-scroll sections skip pinning below ~768px, where a multi-screen-height
   pinned scroll is disproportionate and fights the mobile browser's dynamic toolbar.
+
+## Features
+
+Beyond the core "upload → auto-detect → narrated story → explore" flow:
+
+- **Role-based access** (`server/auth.js`, `server/routes/auth.js`, `EditorAccessControl.jsx`):
+  a Viewer/Editor gate. Everyone can browse, filter, and export; uploading/deleting a dataset
+  needs Editor mode, unlocked via `POST /api/auth/login` with a passcode
+  (`EDITOR_PASSCODE` env var, defaults to `hackathon2026`) that exchanges for a server-generated
+  token, sent as `X-Editor-Token` on the two mutating routes. Enforced server-side (not just a
+  hidden button), and regenerates on every server restart — a redeploy requires re-entering the
+  passcode client-side.
+- **Manual column-type override** (Act 7 sidebar, `DashboardPage.jsx` + `smartDetector.js`'s
+  `typeOverrides` param): click a column's type icon to reassign it (numeric/categorical/date/text)
+  when auto-detection gets it wrong. Takes precedence over the heuristic; resets per dataset.
+- **Shareable/permalink URLs** (`DashboardPage.jsx`, `DatasetHeader.jsx`'s "Copy Link"): the active
+  dataset + filters + visible columns + type overrides are serialized into
+  `?dataset=<id>&state=<json>` via `history.replaceState` as you interact, and restored when that
+  URL is opened fresh. Handles the race between the URL's requested dataset and
+  `DatasetContext`'s own auto-select-first-dataset behavior by re-asserting the target on every
+  `activeDataset` change until it matches (see the effect comment in `DashboardPage.jsx`).
+- **Anomaly flagging** (`storyGenerator.js`'s `buildStandouts`, rendered in
+  `ActStandoutsTables.jsx`): records more than 2 standard deviations from the primary metric's
+  mean, surfaced as an "Unusual Records" panel — a different signal than top5/bottom5, since an
+  outlier can sit mid-range and still be statistically unusual.
+- **Basic forecasting** (`storyGenerator.js`'s `buildTrend`, rendered in `ActTrendChart.jsx`):
+  projects the already-computed least-squares trend line 5 periods forward (spaced at the
+  dataset's own average date interval), drawn as a dashed continuation of the trend chart.
+  Explicitly labeled "not a guaranteed forecast" — simple linear extrapolation, not a real
+  time-series model.
+- **Export Story as PDF** (`DatasetHeader.jsx` → `window.print()`): a print stylesheet
+  (`print:hidden` on interactive-only chrome + a few page-layout rules in `index.css`) turns the
+  narrated Acts 1–6 into a clean printable/PDF-able document, hiding the nav, Act 7's interactive
+  studio, and other controls that don't make sense in a static export.
+- **Dark mode** (`useDarkMode.js`, toggle in `Navbar.jsx`): scoped to the dashboard page only — the
+  landing page's marketing sections weren't converted (raw hex throughout, not the CSS custom
+  properties `index.css` already defines), so the toggle only applies the `.dark` class while
+  `currentPage === 'dashboard'`, and is hidden on the landing page to avoid a half-themed look.
+
+## Roadmap — further hackathon-differentiation ideas
+
+Beyond what's built, roughly in order of value vs. effort for a future pass:
+
+- **Lightweight natural-language filter bar**: parse simple queries like `revenue > 1000 in West`
+  into the existing filter state with a rule-based parser over the already-known column
+  names/types — no external LLM dependency needed.
+- **Dataset comparison mode**: pick two datasets and view their KPIs/trends side by side.
+- **Geo-map view**: when a column pair looks like coordinates, or categorical values match
+  country/state names, render a simple map. Highest visual "wow" on this list, also the largest
+  lift (new dependency, new layout) — not attempted yet.
+- **Multi-file joins**: relate two uploaded CSVs on a shared key (e.g. `students.csv` +
+  `grades.csv` on `student_id`).
+- **Real accounts / multi-tenant workspaces**: persisted per-user dataset libraries, beyond the
+  current single shared Editor passcode.
+- **An LLM-powered "ask your data" layer**: natural-language Q&A over the dataset. Deliberately
+  out of scope without the project owner provisioning an API key/budget.
+- **Real-time collaborative viewing**: shared cursors / live filter sync across sessions viewing
+  the same dataset.
 
 ## Docker
 
@@ -129,6 +213,8 @@ Notes on the `Dockerfile`:
 - Runtime container drops from root to an unprivileged `appuser`.
 - `DATA_DIR` (default `/app/data` in the container) controls where `data.db` and `uploads/` live,
   so a single volume mount persists both across redeploys.
+- `EDITOR_PASSCODE` gates Editor mode (see Features). `docker-compose.yml` reads it from a sibling
+  `.env` file (git-ignored) so a real deployment isn't stuck on the app's built-in default.
 
 ## Deploying to AWS Lightsail
 
@@ -184,9 +270,10 @@ changes, update the `service:` line in that config and restart the `cloudflared`
 
 ## Known limitations (in scope for hackathon judging discussion)
 
-- No authentication/authorization — any client can upload, view, export, or delete any
-  non-sample dataset.
+- The Editor/Viewer gate is a single shared passcode, not per-user accounts — appropriate for a
+  demo, not a real multi-tenant deployment (see Roadmap).
 - No automated tests.
+- Dark mode doesn't extend to the landing page's marketing sections (see Features above).
 - `client/src/components/dashboard/DatasetHeader.jsx` (client-side) and
   `server/routes/export.js` (server-side) both implement CSV/JSON export independently; kept
   as-is (both work, removing either was out of scope for this pass).

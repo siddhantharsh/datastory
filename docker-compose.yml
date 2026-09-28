@@ -6,6 +6,11 @@ services:
     environment:
       - PORT=3001
       - DATA_DIR=/app/data
+      # Gates Editor mode (upload/delete) — override this for any real
+      # deployment rather than relying on the app's own default. Set via a
+      # sibling .env file (git-ignored) rather than editing this committed
+      # file, e.g.: echo "EDITOR_PASSCODE=some-real-value" > .env
+      - EDITOR_PASSCODE=${EDITOR_PASSCODE:-hackathon2026}
     volumes:
       - datastory_data:/app/data
     ports:
