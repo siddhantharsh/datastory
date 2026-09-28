@@ -4,7 +4,7 @@ import { UploadModal } from '../ui/UploadModal';
 import { Database, Upload, Trash2, FileSpreadsheet, ArrowLeft, Download, ChevronDown, FileCode, Table } from 'lucide-react';
 
 export function DatasetHeader({ onBackToHome, filteredRows = [] }) {
-  const { datasets, activeDataset, selectDataset, deleteDataset, loading } = useDataset();
+  const { datasets, activeDataset, selectDataset, deleteDataset, loading, isEditor } = useDataset();
   const [isUploadOpen, setIsUploadOpen] = useState(false);
   const [isExportOpen, setIsExportOpen] = useState(false);
   const exportRef = useRef(null);
@@ -133,13 +133,15 @@ export function DatasetHeader({ onBackToHome, filteredRows = [] }) {
             </select>
           </div>
 
-          <button
-            onClick={() => setIsUploadOpen(true)}
-            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-[12px] border border-[#161513]/15 bg-white text-xs font-sans font-medium text-[#161513] hover:bg-[#faf9f7] transition-all cursor-pointer"
-          >
-            <Upload className="w-4 h-4 text-[#b5470b]" />
-            <span>Upload CSV</span>
-          </button>
+          {isEditor && (
+            <button
+              onClick={() => setIsUploadOpen(true)}
+              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-[12px] border border-[#161513]/15 bg-white text-xs font-sans font-medium text-[#161513] hover:bg-[#faf9f7] transition-all cursor-pointer"
+            >
+              <Upload className="w-4 h-4 text-[#b5470b]" />
+              <span>Upload CSV</span>
+            </button>
+          )}
 
           {/* Export Dropdown Menu */}
           <div className="relative" ref={exportRef}>
@@ -179,7 +181,7 @@ export function DatasetHeader({ onBackToHome, filteredRows = [] }) {
             )}
           </div>
 
-          {activeDataset && !activeDataset.isSample && (
+          {isEditor && activeDataset && !activeDataset.isSample && (
             <button
               className="p-2.5 text-red-600 hover:bg-red-50 rounded-[12px] border border-red-200 transition-colors cursor-pointer"
               title="Delete custom dataset"

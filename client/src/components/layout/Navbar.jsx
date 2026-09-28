@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from '../ui/Button';
 import { UploadModal } from '../ui/UploadModal';
+import { EditorAccessControl } from '../ui/EditorAccessControl';
 import { Upload, ArrowRight, BarChart2 } from 'lucide-react';
 import { useDataset } from '../../context/DatasetContext';
 
 export function Navbar({ currentPage, setCurrentPage }) {
-  const { datasets, activeDataset, selectDataset } = useDataset();
+  const { datasets, activeDataset, selectDataset, isEditor } = useDataset();
   const [isUploadOpen, setIsUploadOpen] = useState(false);
   const [scrollProgress, setScrollProgress] = useState(0);
   const [isVisible, setIsVisible] = useState(true);
@@ -88,14 +89,17 @@ export function Navbar({ currentPage, setCurrentPage }) {
               </Button>
             ) : (
               <>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  icon={Upload}
-                  onClick={() => setIsUploadOpen(true)}
-                >
-                  Import CSV
-                </Button>
+                <EditorAccessControl />
+                {isEditor && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    icon={Upload}
+                    onClick={() => setIsUploadOpen(true)}
+                  >
+                    Import CSV
+                  </Button>
+                )}
                 <Button
                   variant="primary"
                   size="sm"

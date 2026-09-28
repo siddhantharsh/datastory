@@ -2,13 +2,42 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 
 const DatasetContext = createContext();
 
+const EDITOR_TOKEN_KEY = 'datastory_editor_token';
+
 export function DatasetProvider({ children }) {
   const [datasets, setDatasets] = useState([]);
   const [activeDataset, setActiveDataset] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  
+
   const [constellationFilter, setConstellationFilter] = useState(null);
+
+  // Lightweight Editor/Viewer role gate — see server/auth.js. The token is
+  // only meaningful if the server (still) recognizes it; a redeploy/restart
+  // regenerates the server's token, so a stale local one is simply rejected
+  // on the next mutating request (surfaced as a normal 403 error).
+  const [editorToken, setEditorToken] = useState(() => localStorage.getItem(EDITOR_TOKEN_KEY));
+  const isEditor = Boolean(editorToken);
+
+  const loginAsEditor = async (passcode) => {
+    const res = await fetch('/api/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ passcode })
+    });
+    if (!res.ok) {
+      const errData = await res.json();
+      throw new Error(errData.error || 'Login failed');
+    }
+    const { token } = await res.json();
+    localStorage.setItem(EDITOR_TOKEN_KEY, token);
+    setEditorToken(token);
+  };
+
+  const logoutEditor = () => {
+    localStorage.removeItem(EDITOR_TOKEN_KEY);
+    setEditorToken(null);
+  };
 
   // Fetch list of datasets on mount
   const fetchDatasets = async () => {
@@ -62,6 +91,7 @@ export function DatasetProvider({ children }) {
 
       const res = await fetch('/api/upload', {
         method: 'POST',
+        headers: editorToken ? { 'X-Editor-Token': editorToken } : {},
         body: formData
       });
 
@@ -104,7 +134,10 @@ export function DatasetProvider({ children }) {
   const deleteDataset = async (id) => {
     try {
       setLoading(true);
-      const res = await fetch(`/api/datasets/${id}`, { method: 'DELETE' });
+      const res = await fetch(`/api/datasets/${id}`, {
+        method: 'DELETE',
+        headers: editorToken ? { 'X-Editor-Token': editorToken } : {}
+      });
       if (!res.ok) {
         const errData = await res.json();
         throw new Error(errData.error || 'Failed to delete dataset');
@@ -144,7 +177,10 @@ export function DatasetProvider({ children }) {
         uploadDataset,
         deleteDataset,
         constellationFilter,
-        setConstellationFilter
+        setConstellationFilter,
+        isEditor,
+        loginAsEditor,
+        logoutEditor
       }}
     >
       {children}

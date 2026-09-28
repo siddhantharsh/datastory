@@ -9,6 +9,7 @@ require('./db'); // Initializes SQLite DB & auto-seeds samples
 const uploadRoutes = require('./routes/upload');
 const datasetRoutes = require('./routes/dataset');
 const exportRoutes = require('./routes/export');
+const authRoutes = require('./routes/auth');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -24,6 +25,7 @@ app.get('/api/health', (req, res) => {
 });
 
 // API Routes
+app.use('/api/auth', authRoutes);
 app.use('/api/upload', uploadRoutes);
 app.use('/api/datasets', datasetRoutes);
 app.use('/api/export', exportRoutes);

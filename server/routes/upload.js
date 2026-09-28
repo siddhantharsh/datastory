@@ -5,6 +5,7 @@ const path = require('path');
 const fs = require('fs');
 const Papa = require('papaparse');
 const db = require('../db');
+const { requireEditor } = require('../auth');
 
 const uploadDir = process.env.DATA_DIR
   ? path.join(process.env.DATA_DIR, 'uploads')
@@ -125,7 +126,7 @@ function handleUpload(req, res) {
   }
 }
 
-router.post('/', (req, res) => {
+router.post('/', requireEditor, (req, res) => {
   upload.single('file')(req, res, (err) => {
     if (err) {
       if (err instanceof multer.MulterError && err.code === 'LIMIT_FILE_SIZE') {

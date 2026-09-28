@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../db');
+const { requireEditor } = require('../auth');
 
 // GET /api/datasets - List all datasets metadata
 router.get('/', (req, res) => {
@@ -50,7 +51,7 @@ router.get('/:id', (req, res) => {
 });
 
 // DELETE /api/datasets/:id - Delete custom dataset
-router.delete('/:id', (req, res) => {
+router.delete('/:id', requireEditor, (req, res) => {
   try {
     const { id } = req.params;
     const stmt = db.prepare('SELECT * FROM datasets WHERE id = ?');
