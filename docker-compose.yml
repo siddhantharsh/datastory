@@ -6,11 +6,12 @@ services:
     environment:
       - PORT=3001
       - DATA_DIR=/app/data
-      # Gates Editor mode (upload/delete) — override this for any real
-      # deployment rather than relying on the app's own default. Set via a
-      # sibling .env file (git-ignored) rather than editing this committed
-      # file, e.g.: echo "EDITOR_PASSCODE=some-real-value" > .env
-      - EDITOR_PASSCODE=${EDITOR_PASSCODE:-hackathon2026}
+      # Signs login session cookies. Without an explicit value the server
+      # generates a random one at boot, which invalidates every logged-in
+      # session on each restart/redeploy — set a real persisted value via a
+      # sibling .env file (git-ignored), e.g.:
+      #   echo "JWT_SECRET=$(openssl rand -hex 32)" > .env
+      - JWT_SECRET=${JWT_SECRET}
     volumes:
       - datastory_data:/app/data
     ports:

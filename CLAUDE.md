@@ -16,8 +16,10 @@ server/   Express 5 + better-sqlite3 (the only persistence layer — no Mongo/Po
 sample-datasets/   3 synthetic CSVs (attendance/transport/energy), auto-seeded into SQLite on boot
 ```
 
-- **Lightweight Editor/Viewer role gate** (`server/auth.js`) — everyone can browse/filter/export;
-  a passcode unlocks Editor mode (upload/delete), enforced server-side. See "Features" below.
+- **Real per-user accounts** (`server/auth.js`) — email+password signup/login, JWT session cookie,
+  per-dataset ownership and sharing. Replaced an earlier shared-passcode Editor/Viewer gate that
+  didn't actually restrict *who could see* an uploaded dataset (see "Accounts, ownership & sharing"
+  below).
 - **No React Router** — `client/src/App.jsx` toggles between `landing` and `dashboard` with a
   single `useState`; no deep-linking.
 - **State**: one React Context, `client/src/context/DatasetContext.jsx` — holds the active
@@ -49,9 +51,9 @@ npm run dev:client    # Vite dev server on :5173, proxies /api -> :3001
 ```
 
 Open `http://localhost:5173`. `server/data.db` and `server/uploads/` are created on disk and are
-git-ignored (see "Repo hygiene" below). To upload/delete datasets, click the "Viewer" badge in the
-dashboard nav and enter the Editor passcode (`hackathon2026` by default, or your `EDITOR_PASSCODE`
-env var — see "Features").
+git-ignored (see "Repo hygiene" below). To upload a dataset, click "Log in" in the dashboard nav
+and sign up with any email/password (8+ chars) — uploading requires an account; browsing/filtering/
+exporting the 3 bundled samples does not (see "Accounts, ownership & sharing").
 
 ## Repo hygiene notes
 
@@ -66,7 +68,23 @@ automatically, so nothing demo-critical was lost). Known fixed issues, for conte
 - **Stale filter bug**: clicking a particle in the swarm view (Act 2) could desync from Act 7's
   filters/table due to an incomplete `useMemo` dependency array in `DashboardPage.jsx`.
 
-## CSV robustness
+## File format support & CSV robustness
+
+Upload accepts **CSV and Excel** (`.xlsx`/`.xls`). Excel goes through `server/routes/upload.js`'s
+`parseExcel()`, which uses SheetJS (`xlsx`) to read the **first worksheet** and converts it to the
+same `{columns, rows}` shape Papaparse already produces for CSV — every downstream piece
+(`smartDetector.js`, `storyGenerator.js`, every chart) operates on that shared shape regardless of
+source format, so nothing else needed to change. Multi-sheet selection isn't implemented (first
+sheet only). The `xlsx` dependency is installed from **SheetJS's own CDN tarball**
+(`https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz`), not the npm registry — the registry
+version has two unpatched high-severity CVEs (prototype pollution, ReDoS) that SheetJS fixed only
+in their own distribution.
+
+**Apple Numbers (`.numbers`) is deliberately not supported** — it's a proprietary zip-of-protobuf
+format with no maintained Node.js parser. Rather than fail silently or produce garbage, both
+`UploadModal.jsx` (client-side, before any upload) and `upload.js`'s `fileFilter` (server-side)
+detect the extension and reject with an actionable message: *"Numbers files aren't directly
+supported — export as CSV or Excel from Numbers (File → Export To) and upload that instead."*
 
 The app is designed to work on **any** uploaded CSV, not just the 3 bundled samples — column types
 (numeric/categorical/date) are auto-detected by shape, not by column name. A hardening pass fixed
@@ -117,10 +135,24 @@ synthetic test CSVs) found four more real issues, all fixed:
 
 ## Scroll feel & mobile
 
-- **Scroll feel**: Lenis's smoothing (`useLenis.js`) was tuned down from a 1.2s expo-out curve to
-  0.8s cubic-out, and each dashboard Act's CSS reveal transition shortened from 700ms to 300ms —
-  the two were stacking into a near-1-second lag between input and motion. The Act
-  reveal/hide state (`DashboardPage.jsx`) is now symmetric on scroll-up as well as scroll-down.
+- **Snap-scroll story**: Acts 1–6 are each a fixed `100dvh` section with native CSS
+  `scroll-snap-type: y mandatory` (`index.css`'s `html.snap-scroll-active`, toggled on/off by
+  `DashboardPage.jsx` on mount/unmount) — scrolling lands cleanly on one Act at a time instead of
+  free-scrolling past wherever a tall Act's content happened to end. Act 7 (the explorer) stays
+  free-scroll, since it's a workbench with more content than one screen, not a narrative beat. A
+  fixed top nav pill below the main Navbar lists all Acts (1–7) and jumps to any of them on click.
+  Lenis (see below) is disabled on the dashboard page for this to work reliably — it virtualizes
+  scroll position in JS, which fights the browser's native snap logic — and kept only for the
+  landing page's GSAP pinned sections (`useLenis.js`'s `enabled` param, wired from
+  `App.jsx`/`Footer.jsx`'s `SmoothScrollWrapper`). Act sections use `justify-start` rather than
+  `justify-center` internally: centering content that's taller than the `100dvh` slide bleeds it
+  upward past its own `padding-top` (a flex/overflow quirk), which was covering the heading with
+  the fixed nav bars above it — `justify-start` makes the padding a reliable minimum gap instead.
+- **Scroll feel** (landing page only, via Lenis): smoothing (`useLenis.js`) was tuned down from a
+  1.2s expo-out curve to 0.8s cubic-out, and each dashboard Act's CSS reveal transition shortened
+  from 700ms to 300ms — the two were stacking into a near-1-second lag between input and motion.
+  The Act reveal/hide state (`DashboardPage.jsx`) is now symmetric on scroll-up as well as
+  scroll-down.
 - **Mobile**: the Particle Swarm (`ParticleSwarm.jsx`) had zero touch support (mouse-only) — it now
   handles tap-to-filter with the same hit-testing as desktop hover/click. Act sections use `dvh`
   instead of `vh` so the mobile browser's collapsing address bar doesn't cause layout jumps. Act
@@ -129,17 +161,42 @@ synthetic test CSVs) found four more real issues, all fixed:
   landing-page GSAP pinned-scroll sections skip pinning below ~768px, where a multi-screen-height
   pinned scroll is disproportionate and fights the mobile browser's dynamic toolbar.
 
+## Accounts, ownership & sharing
+
+Replaced an earlier shared-passcode Editor/Viewer gate that controlled *who could upload* but not
+*who could see what was uploaded* — every dataset was visible to every visitor regardless of who
+uploaded it. Now:
+
+- **Auth** (`server/auth.js`, `server/routes/auth.js`): email+password accounts. Passwords hashed
+  with `bcryptjs` (pure JS, no native compile — matters on the small Lightsail instance). Sessions
+  are a JWT in an httpOnly, `sameSite=lax` cookie (`datastory_token`, 30-day expiry) — safer against
+  XSS than the old system's localStorage-held editor token. `POST /api/auth/signup` (8+ char
+  password, email normalized to lowercase), `POST /api/auth/login` (identical error whether the
+  email doesn't exist or the password is wrong, so login can't be used to enumerate accounts),
+  `POST /api/auth/logout`, `GET /api/auth/me`. No email verification, password reset, or OAuth —
+  out of scope for a hackathon-scoped app.
+- **Ownership** (`server/db.js`, `server/routes/dataset.js`): datasets have a nullable `owner_id`.
+  `owner_id IS NULL` means public — this covers the 3 bundled samples and anything uploaded under
+  the old passcode system (nothing existing was hidden or orphaned by the migration). New uploads
+  are private to their uploader by default. `GET /api/datasets` (optional-auth) returns public
+  datasets to everyone, plus — if logged in — the caller's own datasets and datasets shared with
+  them, each tagged `access: 'public' | 'owner' | 'shared'` so the UI can group/label them.
+  `GET /api/datasets/:id` 403s unless the dataset is public, owned, or shared with the caller.
+  Upload/delete require `requireAuth`; delete additionally requires ownership.
+- **Sharing** (`dataset_shares` table, `POST /api/datasets/:id/share {email}`,
+  `GET/DELETE /api/datasets/:id/shares`): an owner can grant another *registered* user view access
+  to a dataset by email (404 with a clear message if that email has no account — no invites to
+  non-existent users, no public share links). `ShareModal.jsx` is the owner-only UI for this;
+  `AuthControl.jsx` is the login/signup modal + user badge in `Navbar.jsx`.
+- **Client state** (`DatasetContext.jsx`): `user`, `signup()`, `login()`, `logout()`,
+  `shareDataset()`, `getDatasetShares()`, `revokeDatasetShare()`. Session is restored on mount via
+  `GET /api/auth/me`. `DatasetHeader.jsx` gates Upload/Share/Delete on `user` + ownership, and
+  groups the dataset picker into Samples / Yours / Shared with you by `access`.
+
 ## Features
 
 Beyond the core "upload → auto-detect → narrated story → explore" flow:
 
-- **Role-based access** (`server/auth.js`, `server/routes/auth.js`, `EditorAccessControl.jsx`):
-  a Viewer/Editor gate. Everyone can browse, filter, and export; uploading/deleting a dataset
-  needs Editor mode, unlocked via `POST /api/auth/login` with a passcode
-  (`EDITOR_PASSCODE` env var, defaults to `hackathon2026`) that exchanges for a server-generated
-  token, sent as `X-Editor-Token` on the two mutating routes. Enforced server-side (not just a
-  hidden button), and regenerates on every server restart — a redeploy requires re-entering the
-  passcode client-side.
 - **Manual column-type override** (Act 7 sidebar, `DashboardPage.jsx` + `smartDetector.js`'s
   `typeOverrides` param): click a column's type icon to reassign it (numeric/categorical/date/text)
   when auto-detection gets it wrong. Takes precedence over the heuristic; resets per dataset.
@@ -166,6 +223,9 @@ Beyond the core "upload → auto-detect → narrated story → explore" flow:
   landing page's marketing sections weren't converted (raw hex throughout, not the CSS custom
   properties `index.css` already defines), so the toggle only applies the `.dark` class while
   `currentPage === 'dashboard'`, and is hidden on the landing page to avoid a half-themed look.
+  Defaults to **light mode** — the hook's only source of truth is what was last explicitly toggled
+  in `localStorage`; it does not fall back to the OS's `prefers-color-scheme`, which previously
+  caused dark mode to turn on unexpectedly for anyone with a system-wide dark theme.
 
 ## Roadmap — further hackathon-differentiation ideas
 
@@ -180,8 +240,9 @@ Beyond what's built, roughly in order of value vs. effort for a future pass:
   lift (new dependency, new layout) — not attempted yet.
 - **Multi-file joins**: relate two uploaded CSVs on a shared key (e.g. `students.csv` +
   `grades.csv` on `student_id`).
-- **Real accounts / multi-tenant workspaces**: persisted per-user dataset libraries, beyond the
-  current single shared Editor passcode.
+- **Beyond single-user accounts**: password reset, email verification, OAuth/social login,
+  multi-sheet Excel selection — real accounts + per-dataset ownership + email-based sharing are
+  already built (see "Accounts, ownership & sharing"), these are the next layer on top.
 - **An LLM-powered "ask your data" layer**: natural-language Q&A over the dataset. Deliberately
   out of scope without the project owner provisioning an API key/budget.
 - **Real-time collaborative viewing**: shared cursors / live filter sync across sessions viewing
@@ -213,8 +274,10 @@ Notes on the `Dockerfile`:
 - Runtime container drops from root to an unprivileged `appuser`.
 - `DATA_DIR` (default `/app/data` in the container) controls where `data.db` and `uploads/` live,
   so a single volume mount persists both across redeploys.
-- `EDITOR_PASSCODE` gates Editor mode (see Features). `docker-compose.yml` reads it from a sibling
-  `.env` file (git-ignored) so a real deployment isn't stuck on the app's built-in default.
+- `JWT_SECRET` signs session cookies (see "Accounts, ownership & sharing"). `docker-compose.yml`
+  reads it from a sibling `.env` file (git-ignored): `echo "JWT_SECRET=$(openssl rand -hex 32)" > .env`.
+  Without it, the server generates a random secret at boot, which invalidates every logged-in
+  session on each container restart/redeploy — set a real persisted value before going live.
 
 ## Deploying to AWS Lightsail
 
@@ -270,8 +333,12 @@ changes, update the `service:` line in that config and restart the `cloudflared`
 
 ## Known limitations (in scope for hackathon judging discussion)
 
-- The Editor/Viewer gate is a single shared passcode, not per-user accounts — appropriate for a
-  demo, not a real multi-tenant deployment (see Roadmap).
+- Accounts are email+password only — no password reset, email verification, or OAuth (see
+  Roadmap). Session secret (`JWT_SECRET`) must be set explicitly in production or sessions
+  invalidate on every redeploy (see Docker notes).
+- Excel upload reads only the first worksheet; multi-sheet selection isn't implemented.
+- Apple Numbers files are rejected with a redirect-to-CSV/Excel message, not parsed — no
+  maintained Node.js library exists for the format (see "File format support & CSV robustness").
 - No automated tests.
 - Dark mode doesn't extend to the landing page's marketing sections (see Features above).
 - `client/src/components/dashboard/DatasetHeader.jsx` (client-side) and
