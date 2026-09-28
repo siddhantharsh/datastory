@@ -14,7 +14,7 @@ export default function App() {
 
   return (
     <DatasetProvider>
-      <SmoothScrollWrapper>
+      <SmoothScrollWrapper lenisEnabled={currentPage === 'landing'}>
         <Navbar currentPage={currentPage} setCurrentPage={setCurrentPage} />
         
         <main className="flex-1">

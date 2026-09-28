@@ -380,7 +380,7 @@ export function ParticleSwarm({ rows, meta, actIndex }) {
   return (
     <section
       data-slide-index={actIndex}
-      className="dashboard-slide min-h-[90dvh] flex flex-col justify-center pt-8 border-t border-[var(--ink)]/10 transition-all duration-300 ease-out transform"
+      className="dashboard-slide h-[100dvh] overflow-y-auto snap-start flex flex-col justify-start pt-32 border-t border-[var(--ink)]/10 transition-all duration-300 ease-out transform"
       ref={containerRef}
     >
       {/* SECTION LABEL & HEADING */}
@@ -458,8 +458,11 @@ export function ParticleSwarm({ rows, meta, actIndex }) {
         </div>
       </div>
 
-      {/* MAIN CANVAS CONTAINER */}
-      <div className="relative w-full h-[620px] bg-[var(--bg)] border border-[var(--ink)]/10 rounded-[24px] shadow-sm overflow-hidden flex flex-col">
+      {/* MAIN CANVAS CONTAINER — flex-1 (not a fixed pixel height) so it fills
+          whatever space remains within the slide's fixed 100dvh height after
+          the heading/toolbar above, instead of a hardcoded 620px that could
+          be taller than the actual viewport on a shorter screen. */}
+      <div className="relative w-full flex-1 min-h-0 bg-[var(--bg)] border border-[var(--ink)]/10 rounded-[24px] shadow-sm overflow-hidden flex flex-col">
         <canvas
           ref={canvasRef}
           onMouseMove={handleMouseMove}

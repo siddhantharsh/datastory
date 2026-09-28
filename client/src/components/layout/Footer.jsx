@@ -2,9 +2,9 @@ import React from 'react';
 import { useLenis } from '../../hooks/useLenis';
 import { Github } from 'lucide-react';
 
-export function SmoothScrollWrapper({ children }) {
-  // Initialize Lenis + GSAP ScrollTrigger sync
-  useLenis();
+export function SmoothScrollWrapper({ children, lenisEnabled = true }) {
+  // Initialize Lenis + GSAP ScrollTrigger sync (skippable — see useLenis.js)
+  useLenis(lenisEnabled);
 
   return <div className="min-h-screen flex flex-col">{children}</div>;
 }

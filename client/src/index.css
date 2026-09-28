@@ -516,3 +516,11 @@
     min-height: 0 !important;
   }
 }
+
+/* Dashboard scroll-snap presentation (Acts 1-6). Toggled on <html> by
+   DashboardPage.jsx while mounted, native CSS snap rather than JS-driven —
+   see useLenis.js for why Lenis is disabled on this page instead of trying
+   to make the two cooperate. */
+html.snap-scroll-active {
+  scroll-snap-type: y mandatory;
+}

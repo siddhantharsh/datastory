@@ -102,6 +102,15 @@ export function DashboardPage({ onBackToHome }) {
     window.scrollTo({ top: 0, behavior: 'instant' });
   }, [activeDataset?.id]);
 
+  // Native CSS scroll-snap for Acts 1-6 (see index.css's html.snap-scroll-active
+  // rule) — scoped to this page only via a class toggled on mount/unmount,
+  // since scroll-snap-type lives on the scroll container (html/body), which
+  // is shared with the landing page.
+  useEffect(() => {
+    document.documentElement.classList.add('snap-scroll-active');
+    return () => document.documentElement.classList.remove('snap-scroll-active');
+  }, []);
+
   // Auto-generate smart dashboard configuration when dataset changes
   const config = useMemo(() => {
     if (!activeDataset || !activeDataset.rows || !activeDataset.rows.length) {
@@ -283,9 +292,47 @@ export function DashboardPage({ onBackToHome }) {
   const allColumns = activeDataset.columns || Object.keys(activeDataset.rows[0] || {});
   const displayColumns = visibleColumns.length > 0 ? visibleColumns : allColumns;
 
+  // Top slide nav: only lists Acts that actually rendered for this dataset
+  // (e.g. no date column means no Act 3 "Trend" section) — clicking a dead
+  // button for a section that doesn't exist would be its own confusing bug.
+  const actNavItems = [
+    { num: 1, label: 'Glance', show: Boolean(story?.overview) },
+    { num: 2, label: 'Map', show: Boolean(config?.meta) },
+    { num: 3, label: 'Trend', show: Boolean(story?.trend) },
+    { num: 4, label: 'Breakdown', show: Boolean(story?.breakdown) },
+    { num: 5, label: 'Compare', show: Boolean(story?.comparison) },
+    { num: 6, label: 'Standouts', show: Boolean(story?.standouts) },
+    { num: 7, label: 'Explore', show: true }
+  ].filter((item) => item.show);
+
+  const jumpToSlide = (num) => {
+    document.querySelector(`[data-slide-index="${num}"]`)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
+
   return (
     <div className="min-h-screen bg-[var(--bg)] text-[var(--ink)] pt-20 pb-28 px-6 transition-colors font-sans relative">
-      
+
+      {/* TOP SLIDE NAV — jump between narrated Acts; also doubles as a
+          progress indicator via the highlighted current Act. */}
+      {actNavItems.length > 1 && (
+        <nav className="print:hidden fixed top-16 left-1/2 -translate-x-1/2 z-40 bg-[var(--panel)]/95 backdrop-blur-md border border-[var(--line)] rounded-full shadow-md px-1.5 py-1.5 flex items-center gap-1">
+          {actNavItems.map((item) => (
+            <button
+              key={item.num}
+              onClick={() => jumpToSlide(item.num)}
+              title={item.label}
+              className={`px-2.5 h-7 rounded-full text-[10px] font-mono font-bold uppercase tracking-wide transition-colors cursor-pointer ${
+                activeSlide === item.num
+                  ? 'bg-[#b5470b] text-white'
+                  : 'text-[var(--muted)] hover:bg-[var(--bg)] hover:text-[var(--ink)]'
+              }`}
+            >
+              {item.num}
+            </button>
+          ))}
+        </nav>
+      )}
+
       {/* FLOATING MINIMALIST SLIDESHOW COUNTER */}
       <div className="print:hidden fixed bottom-6 left-6 z-40 bg-[var(--ink)] text-[var(--bg)] px-4 py-2 rounded-full font-mono text-xs shadow-lg flex items-center gap-2">
         <span className="w-2 h-2 rounded-full bg-[#b5470b] animate-pulse" />
@@ -318,7 +365,7 @@ export function DashboardPage({ onBackToHome }) {
             {story.overview && (
               <section
                 data-slide-index="1"
-                className={`dashboard-slide min-h-[85dvh] flex flex-col justify-center pt-8 border-t border-[var(--ink)]/10 transition-all duration-300 ease-out transform ${
+                className={`dashboard-slide h-[100dvh] overflow-y-auto snap-start flex flex-col justify-start pt-32 border-t border-[var(--ink)]/10 transition-all duration-300 ease-out transform ${
                   visibleSlides.has(1) ? 'opacity-100 translate-y-0 scale-100' : 'opacity-20 translate-y-12 scale-[0.98]'
                 }`}
               >
@@ -352,7 +399,7 @@ export function DashboardPage({ onBackToHome }) {
             {story.trend && (
               <section
                 data-slide-index="3"
-                className={`dashboard-slide min-h-[85dvh] flex flex-col justify-center pt-8 border-t border-[var(--ink)]/10 transition-all duration-300 ease-out transform ${
+                className={`dashboard-slide h-[100dvh] overflow-y-auto snap-start flex flex-col justify-start pt-32 border-t border-[var(--ink)]/10 transition-all duration-300 ease-out transform ${
                   visibleSlides.has(3) ? 'opacity-100 translate-y-0 scale-100' : 'opacity-20 translate-y-12 scale-[0.98]'
                 }`}
               >
@@ -375,7 +422,7 @@ export function DashboardPage({ onBackToHome }) {
             {story.breakdown && (
               <section
                 data-slide-index="4"
-                className={`dashboard-slide min-h-[85dvh] flex flex-col justify-center pt-8 border-t border-[var(--ink)]/10 transition-all duration-300 ease-out transform ${
+                className={`dashboard-slide h-[100dvh] overflow-y-auto snap-start flex flex-col justify-start pt-32 border-t border-[var(--ink)]/10 transition-all duration-300 ease-out transform ${
                   visibleSlides.has(4) ? 'opacity-100 translate-y-0 scale-100' : 'opacity-20 translate-y-12 scale-[0.98]'
                 }`}
               >
@@ -398,7 +445,7 @@ export function DashboardPage({ onBackToHome }) {
             {story.comparison && (
               <section
                 data-slide-index="5"
-                className={`dashboard-slide min-h-[85dvh] flex flex-col justify-center pt-8 border-t border-[var(--ink)]/10 transition-all duration-300 ease-out transform ${
+                className={`dashboard-slide h-[100dvh] overflow-y-auto snap-start flex flex-col justify-start pt-32 border-t border-[var(--ink)]/10 transition-all duration-300 ease-out transform ${
                   visibleSlides.has(5) ? 'opacity-100 translate-y-0 scale-100' : 'opacity-20 translate-y-12 scale-[0.98]'
                 }`}
               >
@@ -421,7 +468,7 @@ export function DashboardPage({ onBackToHome }) {
             {story.standouts && (
               <section
                 data-slide-index="6"
-                className={`dashboard-slide min-h-[85dvh] flex flex-col justify-center pt-8 border-t border-[var(--ink)]/10 transition-all duration-300 ease-out transform ${
+                className={`dashboard-slide h-[100dvh] overflow-y-auto snap-start flex flex-col justify-start pt-32 border-t border-[var(--ink)]/10 transition-all duration-300 ease-out transform ${
                   visibleSlides.has(6) ? 'opacity-100 translate-y-0 scale-100' : 'opacity-20 translate-y-12 scale-[0.98]'
                 }`}
               >
@@ -447,7 +494,7 @@ export function DashboardPage({ onBackToHome }) {
         <section
           id="act-7-explore"
           data-slide-index="7"
-          className={`print:hidden dashboard-slide pt-16 border-t-2 border-[var(--ink)]/15 transition-all duration-300 ease-out transform ${
+          className={`print:hidden dashboard-slide snap-start pt-16 border-t-2 border-[var(--ink)]/15 transition-all duration-300 ease-out transform ${
             visibleSlides.has(7) ? 'opacity-100 translate-y-0' : 'opacity-20 translate-y-12'
           }`}
         >

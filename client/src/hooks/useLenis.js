@@ -5,8 +5,16 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 gsap.registerPlugin(ScrollTrigger);
 
-export function useLenis() {
+// `enabled` lets a page opt out entirely — the dashboard uses native CSS
+// scroll-snap instead (see DashboardPage.jsx), and Lenis virtualizing scroll
+// position in JS is known to fight with the browser's native snap logic
+// (native snap reacts to real scroll events; Lenis intercepts and replaces
+// them). The landing page keeps Lenis on, since its own GSAP pin/scrub
+// sections are driven by it.
+export function useLenis(enabled = true) {
   useEffect(() => {
+    if (!enabled) return undefined;
+
     // Lenis Smooth Scroll setup. duration was 1.2s with an expo-out easing —
     // heavy enough that the viewport kept drifting for close to a second
     // after wheel/trackpad input stopped, which read as "not real scrolling."
@@ -32,5 +40,5 @@ export function useLenis() {
       gsap.ticker.remove(updateTicker);
       lenis.destroy();
     };
-  }, []);
+  }, [enabled]);
 }
