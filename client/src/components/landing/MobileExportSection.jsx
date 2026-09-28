@@ -29,13 +29,18 @@ export function MobileExportSection() {
 
       if (!pinEl || !phoneEl) return;
 
+      // Pinned scroll-jacking is disproportionately long on a short mobile
+      // viewport and fights with the mobile browser's dynamic toolbar — skip
+      // the pin below ~768px and scrub over a shorter, unpinned distance.
+      const isMobile = window.innerWidth < 768;
+
       // Master Timeline for Scroll-Driven Mobile Showcase (matching Justus John Mobile Section)
       const tl = gsap.timeline({
         scrollTrigger: {
           trigger: pinEl,
           start: 'top top',
-          end: '+=400%',
-          pin: true,
+          end: isMobile ? '+=100%' : '+=400%',
+          pin: !isMobile,
           scrub: 1,
           anticipatePin: 1
         }

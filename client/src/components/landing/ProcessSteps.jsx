@@ -37,12 +37,19 @@ export function ProcessSteps() {
       gsap.set(cos, { yPercent: -50, y: (i) => OPEN[i] });
       gsap.set(pulseRef.current, { xPercent: -50, yPercent: -50, opacity: 0 });
 
+      // Pinned scroll-jacking is disproportionately long on a short mobile
+      // viewport (this section would need ~2.2x the screen height of scroll
+      // input just to complete) and fights with the mobile browser's dynamic
+      // toolbar — skip the pin below ~768px and let the timeline scrub over
+      // a shorter, unpinned scroll distance instead.
+      const isMobile = window.innerWidth < 768;
+
       const tl = gsap.timeline({
         scrollTrigger: {
           trigger: pinRef.current,
           start: 'top top',
-          end: '+=220%',
-          pin: true,
+          end: isMobile ? '+=80%' : '+=220%',
+          pin: !isMobile,
           scrub: 1,
           anticipatePin: 1,
           invalidateOnRefresh: true,

@@ -170,7 +170,7 @@ export function FilterBar({ meta, rows, filters, onFilterChange, onClearFilters,
                 </button>
 
                 {isOpen && (
-                  <div className="absolute left-0 mt-2 w-64 max-h-72 overflow-y-auto bg-white border border-[#161513]/15 rounded-[12px] shadow-xl z-50 p-2 text-xs space-y-1">
+                  <div className="absolute left-0 mt-2 w-64 max-w-[90vw] max-h-72 overflow-y-auto bg-white border border-[#161513]/15 rounded-[12px] shadow-xl z-50 p-2 text-xs space-y-1">
                     <div className="font-mono text-[10px] uppercase tracking-wider text-[#9b958c] px-2 py-1.5 border-b border-[#161513]/8 font-semibold flex justify-between">
                       <span className="truncate">Filter by {formatColName(col)}</span>
                       {selected.length > 0 && (

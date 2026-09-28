@@ -14,6 +14,7 @@ import { ParticleSwarm } from '../components/dashboard/ParticleSwarm';
 import { useDataset } from '../context/DatasetContext';
 import { generateSmartDashboardConfig, formatColName } from '../utils/smartDetector';
 import { generateStory } from '../utils/storyGenerator';
+import { parseNumericValue, parseDateValue } from '../utils/csvHelpers';
 
 import { Sliders, CheckSquare, Square, Sparkles, ChevronLeft, ChevronRight, Hash, Calendar, Tag, Type, ArrowDown } from 'lucide-react';
 
@@ -86,6 +87,17 @@ export function DashboardPage({ onBackToHome }) {
         if (entry.isIntersecting) {
           if (slideNum) setActiveSlide(slideNum);
           setVisibleSlides((prev) => new Set([...prev, slideNum]));
+        } else {
+          // Mirror the reveal on the way back out too — otherwise scrolling
+          // back up shows only already-settled sections while scrolling down
+          // triggers the animation exactly once, an asymmetry that reads as
+          // scroll feeling "wrong."
+          setVisibleSlides((prev) => {
+            if (!prev.has(slideNum)) return prev;
+            const next = new Set(prev);
+            next.delete(slideNum);
+            return next;
+          });
         }
       });
     };
@@ -124,10 +136,10 @@ export function DashboardPage({ onBackToHome }) {
       Object.entries(filters.numeric).forEach(([col, range]) => {
         const [min, max] = range || [];
         if (min !== null && min !== undefined && !isNaN(min)) {
-          rows = rows.filter((r) => Number(r[col]) >= Number(min));
+          rows = rows.filter((r) => parseNumericValue(r[col]) >= Number(min));
         }
         if (max !== null && max !== undefined && !isNaN(max)) {
-          rows = rows.filter((r) => Number(r[col]) <= Number(max));
+          rows = rows.filter((r) => parseNumericValue(r[col]) <= Number(max));
         }
       });
     }
@@ -136,15 +148,22 @@ export function DashboardPage({ onBackToHome }) {
     if (filters.dateRange?.start || filters.dateRange?.end) {
       const { start, end } = filters.dateRange;
       const dateCol = config?.meta?.dateCol;
+      const dateFormat = config?.meta?.dateFormat;
 
       if (dateCol) {
         if (start) {
           const startDate = new Date(start);
-          rows = rows.filter((r) => new Date(r[dateCol]) >= startDate);
+          rows = rows.filter((r) => {
+            const d = parseDateValue(r[dateCol], dateFormat);
+            return d && d >= startDate;
+          });
         }
         if (end) {
           const endDate = new Date(end + 'T23:59:59');
-          rows = rows.filter((r) => new Date(r[dateCol]) <= endDate);
+          rows = rows.filter((r) => {
+            const d = parseDateValue(r[dateCol], dateFormat);
+            return d && d <= endDate;
+          });
         }
       }
     }
@@ -232,7 +251,7 @@ export function DashboardPage({ onBackToHome }) {
             {story.overview && (
               <section
                 data-slide-index="1"
-                className={`dashboard-slide min-h-[85vh] flex flex-col justify-center pt-8 border-t border-[#161513]/10 transition-all duration-700 ease-out transform ${
+                className={`dashboard-slide min-h-[85dvh] flex flex-col justify-center pt-8 border-t border-[#161513]/10 transition-all duration-300 ease-out transform ${
                   visibleSlides.has(1) ? 'opacity-100 translate-y-0 scale-100' : 'opacity-20 translate-y-12 scale-[0.98]'
                 }`}
               >
@@ -266,7 +285,7 @@ export function DashboardPage({ onBackToHome }) {
             {story.trend && (
               <section
                 data-slide-index="3"
-                className={`dashboard-slide min-h-[85vh] flex flex-col justify-center pt-8 border-t border-[#161513]/10 transition-all duration-700 ease-out transform ${
+                className={`dashboard-slide min-h-[85dvh] flex flex-col justify-center pt-8 border-t border-[#161513]/10 transition-all duration-300 ease-out transform ${
                   visibleSlides.has(3) ? 'opacity-100 translate-y-0 scale-100' : 'opacity-20 translate-y-12 scale-[0.98]'
                 }`}
               >
@@ -289,7 +308,7 @@ export function DashboardPage({ onBackToHome }) {
             {story.breakdown && (
               <section
                 data-slide-index="4"
-                className={`dashboard-slide min-h-[85vh] flex flex-col justify-center pt-8 border-t border-[#161513]/10 transition-all duration-700 ease-out transform ${
+                className={`dashboard-slide min-h-[85dvh] flex flex-col justify-center pt-8 border-t border-[#161513]/10 transition-all duration-300 ease-out transform ${
                   visibleSlides.has(4) ? 'opacity-100 translate-y-0 scale-100' : 'opacity-20 translate-y-12 scale-[0.98]'
                 }`}
               >
@@ -312,7 +331,7 @@ export function DashboardPage({ onBackToHome }) {
             {story.comparison && (
               <section
                 data-slide-index="5"
-                className={`dashboard-slide min-h-[85vh] flex flex-col justify-center pt-8 border-t border-[#161513]/10 transition-all duration-700 ease-out transform ${
+                className={`dashboard-slide min-h-[85dvh] flex flex-col justify-center pt-8 border-t border-[#161513]/10 transition-all duration-300 ease-out transform ${
                   visibleSlides.has(5) ? 'opacity-100 translate-y-0 scale-100' : 'opacity-20 translate-y-12 scale-[0.98]'
                 }`}
               >
@@ -335,7 +354,7 @@ export function DashboardPage({ onBackToHome }) {
             {story.standouts && (
               <section
                 data-slide-index="6"
-                className={`dashboard-slide min-h-[85vh] flex flex-col justify-center pt-8 border-t border-[#161513]/10 transition-all duration-700 ease-out transform ${
+                className={`dashboard-slide min-h-[85dvh] flex flex-col justify-center pt-8 border-t border-[#161513]/10 transition-all duration-300 ease-out transform ${
                   visibleSlides.has(6) ? 'opacity-100 translate-y-0 scale-100' : 'opacity-20 translate-y-12 scale-[0.98]'
                 }`}
               >
@@ -361,7 +380,7 @@ export function DashboardPage({ onBackToHome }) {
         <section
           id="act-7-explore"
           data-slide-index="7"
-          className={`dashboard-slide pt-16 border-t-2 border-[#161513]/15 transition-all duration-700 ease-out transform ${
+          className={`dashboard-slide pt-16 border-t-2 border-[#161513]/15 transition-all duration-300 ease-out transform ${
             visibleSlides.has(7) ? 'opacity-100 translate-y-0' : 'opacity-20 translate-y-12'
           }`}
         >
@@ -403,8 +422,11 @@ export function DashboardPage({ onBackToHome }) {
           <div className="flex flex-col lg:flex-row gap-8 items-start relative mt-8">
             
             {/* COLLAPSIBLE SIDEBAR: Column Selector & Controls */}
+            {/* Ordered after the charts/table on mobile (order-2) so users see
+                data before a tall filter-attribute list; restored to its usual
+                left position at lg+ (order-1). */}
             <aside
-              className={`transition-all duration-300 ease-in-out shrink-0 w-full ${
+              className={`order-2 lg:order-1 transition-all duration-300 ease-in-out shrink-0 w-full ${
                 isSidebarOpen ? 'lg:w-64' : 'lg:w-12'
               }`}
             >
@@ -423,10 +445,13 @@ export function DashboardPage({ onBackToHome }) {
                     </div>
                   )}
 
+                  {/* The collapse only changes anything at lg+ (below that the
+                      sidebar is always full-width), so hide the toggle rather
+                      than show a control that visibly does nothing on mobile/tablet. */}
                   <button
                     onClick={() => setIsSidebarOpen(!isSidebarOpen)}
                     title={isSidebarOpen ? 'Collapse Sidebar' : 'Expand Sidebar'}
-                    className="p-1 rounded-[6px] hover:bg-[#faf9f7] text-[#6f6a62] cursor-pointer"
+                    className="hidden lg:block p-1 rounded-[6px] hover:bg-[#faf9f7] text-[#6f6a62] cursor-pointer"
                   >
                     {isSidebarOpen ? <ChevronLeft className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
                   </button>
@@ -540,7 +565,7 @@ export function DashboardPage({ onBackToHome }) {
             </aside>
 
             {/* MAIN GRID CONTENT FOR ACT 6 */}
-            <main className="flex-1 w-full min-w-0">
+            <main className="order-1 lg:order-2 flex-1 w-full min-w-0">
               
               {/* RECHARTS PANELS */}
               {config && (

@@ -59,13 +59,20 @@ export function InteractiveDemo() {
       updateScale();
       window.addEventListener('resize', updateScale);
 
+      // Pinned scroll-jacking is disproportionately long on a short mobile
+      // viewport and fights with the mobile browser's dynamic toolbar — skip
+      // the pin below ~768px and scrub over a shorter, unpinned distance.
+      // (The scaled-down browser mockup's legibility on small screens is a
+      // separate, larger redesign left out of this pass.)
+      const isMobile = window.innerWidth < 768;
+
       // Master Timeline matching justus-john.com buildAkt1 choreography
       const tl = gsap.timeline({
         scrollTrigger: {
           trigger: pinRef.current,
           start: 'top top',
-          end: '+=550%',
-          pin: true,
+          end: isMobile ? '+=120%' : '+=550%',
+          pin: !isMobile,
           scrub: 1,
           anticipatePin: 1,
           invalidateOnRefresh: true

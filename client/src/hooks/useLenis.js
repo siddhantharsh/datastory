@@ -7,10 +7,13 @@ gsap.registerPlugin(ScrollTrigger);
 
 export function useLenis() {
   useEffect(() => {
-    // Lenis Smooth Scroll setup
+    // Lenis Smooth Scroll setup. duration was 1.2s with an expo-out easing —
+    // heavy enough that the viewport kept drifting for close to a second
+    // after wheel/trackpad input stopped, which read as "not real scrolling."
+    // A shorter duration + standard cubic-out tracks much closer to native.
     const lenis = new Lenis({
-      duration: 1.2,
-      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+      duration: 0.8,
+      easing: (t) => 1 - Math.pow(1 - t, 3),
       smoothWheel: true,
       smoothTouch: false
     });

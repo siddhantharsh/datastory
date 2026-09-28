@@ -1,6 +1,7 @@
 import React, { useRef, useEffect, useState, useMemo } from 'react';
 import { useDataset } from '../../context/DatasetContext';
 import { formatNumberValue, formatColName } from '../../utils/smartDetector';
+import { parseNumericValue } from '../../utils/csvHelpers';
 import {
   getCategoryColorMap,
   layoutCluster,
@@ -25,10 +26,19 @@ export function ParticleSwarm({ rows, meta, actIndex }) {
   const numericCol = meta?.numericCols?.[0];
   const dateCol = meta?.dateCol;
 
-  // Cap dataset display rows to 500 max for canvas swarm
+  // Cap dataset display rows to 500 max for canvas swarm. Sampled with an
+  // even stride across the full range (not just a prefix slice) so a large
+  // chronologically-ordered dataset isn't visually biased toward only its
+  // earliest 500 rows.
   const displayRows = useMemo(() => {
     if (!rows || !rows.length) return [];
-    return rows.length > 500 ? rows.slice(0, 500) : rows;
+    if (rows.length <= 500) return rows;
+    const step = rows.length / 500;
+    const sampled = [];
+    for (let i = 0; i < 500; i++) {
+      sampled.push(rows[Math.floor(i * step)]);
+    }
+    return sampled;
   }, [rows]);
 
   // Unique categories & Color Mapping
@@ -50,7 +60,8 @@ export function ParticleSwarm({ rows, meta, actIndex }) {
 
     particlesRef.current = displayRows.map((r, idx) => {
       const cat = String(r[categoricalCol] ?? 'Other');
-      const val = numericCol && !isNaN(Number(r[numericCol])) ? Number(r[numericCol]) : 1;
+      const parsedVal = numericCol ? parseNumericValue(r[numericCol]) : NaN;
+      const val = !isNaN(parsedVal) ? parsedVal : 1;
       const d = dateCol ? r[dateCol] : null;
 
       return {
@@ -276,27 +287,41 @@ export function ParticleSwarm({ rows, meta, actIndex }) {
     return () => observer.disconnect();
   }, []);
 
-  // Hit-Testing Mouse Handlers
-  const handleMouseMove = (e) => {
+  // Hit-Testing (shared by mouse and touch input)
+  const hitTest = (clientX, clientY) => {
     const canvas = canvasRef.current;
-    if (!canvas) return;
+    if (!canvas) return null;
 
     const rect = canvas.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-    setMousePos({ x: e.clientX, y: e.clientY });
+    const x = clientX - rect.left;
+    const y = clientY - rect.top;
 
-    let found = null;
     for (let i = particlesRef.current.length - 1; i >= 0; i--) {
       const p = particlesRef.current[i];
       const dx = x - p.x;
       const dy = y - p.y;
       const hitR = Math.max(8, p.radius + 4);
       if (dx * dx + dy * dy <= hitR * hitR) {
-        found = p;
-        break;
+        return p;
       }
     }
+    return null;
+  };
+
+  const applyFilterFor = (found) => {
+    if (found) {
+      setConstellationFilter(prev => String(prev) === String(found.category) ? null : found.category);
+    } else {
+      setConstellationFilter(null);
+    }
+  };
+
+  const handleMouseMove = (e) => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    setMousePos({ x: e.clientX, y: e.clientY });
+    const found = hitTest(e.clientX, e.clientY);
 
     if (found !== hoveredParticle) {
       setHoveredParticle(found);
@@ -310,36 +335,46 @@ export function ParticleSwarm({ rows, meta, actIndex }) {
   };
 
   const handleClick = (e) => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
+    applyFilterFor(hitTest(e.clientX, e.clientY));
+  };
 
-    const rect = canvas.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
+  // Touch support: canvas previously only responded to mouse events, so it
+  // was entirely non-interactive on phones/tablets (no hover state exists on
+  // touch, and tap alone still fires a click, but with zero visual feedback
+  // telling the user anything was tappable). A tap here shows the tooltip and
+  // applies the filter together; a drag/swipe (used to scroll the page past
+  // this section) is left alone by checking movement between start and end.
+  const TAP_MOVE_THRESHOLD = 10;
+  const touchStartRef = useRef({ x: 0, y: 0, moved: false });
 
-    let found = null;
-    for (let i = particlesRef.current.length - 1; i >= 0; i--) {
-      const p = particlesRef.current[i];
-      const dx = x - p.x;
-      const dy = y - p.y;
-      const hitR = Math.max(8, p.radius + 4);
-      if (dx * dx + dy * dy <= hitR * hitR) {
-        found = p;
-        break;
-      }
+  const handleTouchStart = (e) => {
+    const t = e.touches[0];
+    if (!t) return;
+    touchStartRef.current = { x: t.clientX, y: t.clientY, moved: false };
+  };
+
+  const handleTouchMove = (e) => {
+    const t = e.touches[0];
+    if (!t) return;
+    const { x, y } = touchStartRef.current;
+    if (Math.abs(t.clientX - x) > TAP_MOVE_THRESHOLD || Math.abs(t.clientY - y) > TAP_MOVE_THRESHOLD) {
+      touchStartRef.current.moved = true;
     }
+  };
 
-    if (found) {
-      setConstellationFilter(prev => String(prev) === String(found.category) ? null : found.category);
-    } else {
-      setConstellationFilter(null);
-    }
+  const handleTouchEnd = () => {
+    if (touchStartRef.current.moved) return;
+    const { x, y } = touchStartRef.current;
+    const found = hitTest(x, y);
+    setMousePos({ x, y });
+    setHoveredParticle(found);
+    applyFilterFor(found);
   };
 
   return (
     <section
       data-slide-index={actIndex}
-      className="dashboard-slide min-h-[90vh] flex flex-col justify-center pt-8 border-t border-[#161513]/10 transition-all duration-700 ease-out transform"
+      className="dashboard-slide min-h-[90dvh] flex flex-col justify-center pt-8 border-t border-[#161513]/10 transition-all duration-300 ease-out transform"
       ref={containerRef}
     >
       {/* SECTION LABEL & HEADING */}
@@ -354,6 +389,10 @@ export function ParticleSwarm({ rows, meta, actIndex }) {
           </h2>
           <p className="font-mono text-[13px] text-[#6f6a62] max-w-3xl">
             {narrativeText || `Each dot is one record. Switch views to transform spatial arrangements.`}
+          </p>
+          <p className="font-mono text-[11px] text-[#9b958c] flex items-center gap-1.5 mt-1.5">
+            <Info className="w-3 h-3 shrink-0" />
+            <span>Click or tap any point to filter the story below.</span>
           </p>
         </div>
 
@@ -420,7 +459,10 @@ export function ParticleSwarm({ rows, meta, actIndex }) {
           onMouseMove={handleMouseMove}
           onMouseLeave={handleMouseLeave}
           onClick={handleClick}
-          className="w-full h-full flex-1 block"
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
+          className="w-full h-full flex-1 block touch-pan-y"
         />
 
         {/* FLOATING HOVER TOOLTIP CARD */}
