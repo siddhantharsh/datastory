@@ -1,5 +1,12 @@
 import React from 'react';
 import { formatColName, formatNumberValue } from '../../utils/smartDetector';
+import { parseNumericValue } from '../../utils/csvHelpers';
+
+// A raw cell value of 0/false is a legitimate label (e.g. a 0/1-coded
+// category), not a missing one — only null/undefined/'' should drop out.
+function labelOrNull(val) {
+  return val === null || val === undefined || val === '' ? null : String(val);
+}
 
 export function ActStandoutsTables({ standoutsInfo }) {
   if (!standoutsInfo || !standoutsInfo.top5) return null;
@@ -22,9 +29,9 @@ export function ActStandoutsTables({ standoutsInfo }) {
 
         <div className="space-y-2.5 font-mono text-xs">
           {top5.map((row, idx) => {
-            const val = Number(row[numCol]);
-            const cat = categoryCol ? row[categoryCol] : null;
-            const date = dateCol ? row[dateCol] : null;
+            const val = parseNumericValue(row[numCol]);
+            const cat = categoryCol ? labelOrNull(row[categoryCol]) : null;
+            const date = dateCol ? labelOrNull(row[dateCol]) : null;
 
             return (
               <div
@@ -61,9 +68,9 @@ export function ActStandoutsTables({ standoutsInfo }) {
 
         <div className="space-y-2.5 font-mono text-xs">
           {bottom5.map((row, idx) => {
-            const val = Number(row[numCol]);
-            const cat = categoryCol ? row[categoryCol] : null;
-            const date = dateCol ? row[dateCol] : null;
+            const val = parseNumericValue(row[numCol]);
+            const cat = categoryCol ? labelOrNull(row[categoryCol]) : null;
+            const date = dateCol ? labelOrNull(row[dateCol]) : null;
 
             return (
               <div

@@ -1,25 +1,30 @@
 import React, { useMemo } from 'react';
 import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts';
 import { formatColName, formatNumberValue } from '../../utils/smartDetector';
+import { parseNumericValue, parseDateValue } from '../../utils/csvHelpers';
 
 export function ActTrendChart({ data = [], trendInfo }) {
   if (!trendInfo || !data.length) return null;
 
-  const { dateCol, numCol, peak, trough } = trendInfo;
+  const { dateCol, numCol, dateFormat, peak, trough } = trendInfo;
 
   const chartData = useMemo(() => {
     const sorted = [...data]
       .filter((r) => r[dateCol] && r[numCol] !== null && r[numCol] !== undefined)
-      .sort((a, b) => new Date(a[dateCol]) - new Date(b[dateCol]));
+      .sort((a, b) => {
+        const da = parseDateValue(a[dateCol], dateFormat);
+        const db = parseDateValue(b[dateCol], dateFormat);
+        return (da ?? new Date(0)) - (db ?? new Date(0));
+      });
 
     const step = Math.max(1, Math.floor(sorted.length / 60));
     return sorted.filter((_, i) => i % step === 0).map((r) => ({
       name: String(r[dateCol]),
-      val: Number(r[numCol]) || 0,
+      val: parseNumericValue(r[numCol]) || 0,
       isPeak: String(r[dateCol]) === peak?.date,
       isTrough: String(r[dateCol]) === trough?.date
     }));
-  }, [data, dateCol, numCol, peak, trough]);
+  }, [data, dateCol, numCol, dateFormat, peak, trough]);
 
   return (
     <div className="p-8 sm:p-10 bg-white border border-[#161513]/10 rounded-[24px] shadow-sm">

@@ -2,6 +2,7 @@ import React, { useMemo } from 'react';
 import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts';
 import { DEFAULT_COLORS } from '../../utils/chartPalettes';
 import { formatColName, formatNumberValue } from '../../utils/smartDetector';
+import { parseNumericValue } from '../../utils/csvHelpers';
 
 export function ActComparisonChart({ data = [], comparisonInfo }) {
   if (!comparisonInfo || !data.length) return null;
@@ -12,9 +13,9 @@ export function ActComparisonChart({ data = [], comparisonInfo }) {
     if (!xCol) return [];
     const step = Math.max(1, Math.floor(data.length / 40));
     return data.filter((_, i) => i % step === 0).map((r) => ({
-      name: String(r[xCol] || '').trim(),
-      [col1]: Number(r[col1]) || 0,
-      [col2]: Number(r[col2]) || 0
+      name: String(r[xCol] ?? '').trim(),
+      [col1]: parseNumericValue(r[col1]) || 0,
+      [col2]: parseNumericValue(r[col2]) || 0
     }));
   }, [data, col1, col2, xCol]);
 

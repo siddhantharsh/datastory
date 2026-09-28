@@ -120,7 +120,12 @@ function buildOverview(data, columns, dateCol, primaryCat, dateFormat) {
     narrativeText = `You're looking at <span class="font-bold text-[#b5470b]">${rowCount.toLocaleString()} records</span> across <span class="font-bold text-[#161513]">${colCount} columns</span>, spanning <span class="font-bold text-[#161513]">${minDate}</span> to <span class="font-bold text-[#161513]">${maxDate}</span>.`;
   } else {
     const catColName = escapeHtml(primaryCat ? formatColName(primaryCat) : 'attributes');
-    const uniqueVals = new Set(data.map((r) => r[primaryCat]).filter(Boolean));
+    // filter(Boolean) would drop legitimate falsy category values like 0 or
+    // false (common for numerically-coded categoricals, e.g. a 0/1 "survived"
+    // column) — only null/undefined/empty-string are actually "missing".
+    const uniqueVals = new Set(
+      data.map((r) => r[primaryCat]).filter((v) => v !== null && v !== undefined && v !== '')
+    );
 
     narrativeText = `You're looking at <span class="font-bold text-[#b5470b]">${rowCount.toLocaleString()} records</span> across <span class="font-bold text-[#161513]">${colCount} columns</span>, covering <span class="font-bold text-[#161513]">${uniqueVals.size} unique ${catColName}</span> values.`;
   }
@@ -157,8 +162,8 @@ function buildTrend(data, dateCol, numCol, dateFormat) {
 
   const peakVal = formatNumberValue(parseNumericValue(peak[numCol]));
   const troughVal = formatNumberValue(parseNumericValue(trough[numCol]));
-  const peakDate = String(peak[dateCol] || '');
-  const troughDate = String(trough[dateCol] || '');
+  const peakDate = String(peak[dateCol] ?? '');
+  const troughDate = String(trough[dateCol] ?? '');
 
   const narrativeText = `<span class="font-bold text-[#161513]">${escapeHtml(formatColName(numCol))}</span> trended <span class="font-bold text-[#b5470b]">${direction}</span> over this period. It peaked at <span class="font-bold text-[#b5470b]">${peakVal}</span> on <span class="font-bold text-[#161513]">${escapeHtml(peakDate)}</span> and hit its lowest at <span class="font-bold text-[#6f6a62]">${troughVal}</span> on <span class="font-bold text-[#161513]">${escapeHtml(troughDate)}</span>.`;
 
@@ -167,6 +172,7 @@ function buildTrend(data, dateCol, numCol, dateFormat) {
     narrative: narrativeText,
     numCol,
     dateCol,
+    dateFormat,
     direction,
     peak: { value: peakVal, rawValue: parseNumericValue(peak[numCol]), date: peakDate, row: peak },
     trough: { value: troughVal, rawValue: parseNumericValue(trough[numCol]), date: troughDate, row: trough }
@@ -177,7 +183,11 @@ function buildTrend(data, dateCol, numCol, dateFormat) {
 function buildBreakdown(data, categoryCol, numCol) {
   const map = {};
   data.forEach((r) => {
-    const cat = String(r[categoryCol] || 'Other').trim();
+    // r[categoryCol] || 'Other' would relabel a legitimate 0/false category
+    // value (e.g. a 0/1-coded column) as "Other" — only fall back on
+    // null/undefined/empty-string.
+    const rawCat = r[categoryCol];
+    const cat = (rawCat === null || rawCat === undefined || rawCat === '' ? 'Other' : String(rawCat)).trim();
     const val = parseNumericValue(r[numCol]) || 0;
     map[cat] = (map[cat] || 0) + val;
   });
@@ -258,11 +268,13 @@ function buildStandouts(data, numCol, categoryCol, dateCol) {
   const topVal = parseNumericValue(topRow[numCol]);
   const bottomVal = parseNumericValue(bottomRow[numCol]);
 
-  const topCat = categoryCol ? String(topRow[categoryCol] || '') : '';
-  const topDate = dateCol ? String(topRow[dateCol] || '') : '';
+  // ?? rather than || — a category/date that is legitimately 0 or false
+  // (e.g. a 0/1-coded column) must not collapse to an empty string here.
+  const topCat = categoryCol ? String(topRow[categoryCol] ?? '') : '';
+  const topDate = dateCol ? String(topRow[dateCol] ?? '') : '';
 
-  const bottomCat = categoryCol ? String(bottomRow[categoryCol] || '') : '';
-  const bottomDate = dateCol ? String(bottomRow[dateCol] || '') : '';
+  const bottomCat = categoryCol ? String(bottomRow[categoryCol] ?? '') : '';
+  const bottomDate = dateCol ? String(bottomRow[dateCol] ?? '') : '';
 
   const gapPercent = topVal > 0 ? (((topVal - bottomVal) / topVal) * 100).toFixed(0) : '0';
 
