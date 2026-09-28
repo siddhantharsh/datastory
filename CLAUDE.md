@@ -64,6 +64,45 @@ automatically, so nothing demo-critical was lost). Known fixed issues, for conte
 - **Stale filter bug**: clicking a particle in the swarm view (Act 2) could desync from Act 7's
   filters/table due to an incomplete `useMemo` dependency array in `DashboardPage.jsx`.
 
+## CSV robustness
+
+The app is designed to work on **any** uploaded CSV, not just the 3 bundled samples — column types
+(numeric/categorical/date) are auto-detected by shape, not by column name. A hardening pass fixed
+several real gaps found by auditing the upload → parse → store → detect → visualize pipeline:
+
+- **Ingestion** (`server/routes/upload.js`, `server/db.js`): the column list is now read from
+  Papaparse's `meta.fields` (the actual header row) instead of the first data row's keys, which
+  previously lost columns entirely on a ragged CSV. Parse errors are surfaced as non-fatal
+  `warnings` instead of discarded; wrong-file-type/oversized uploads now return 400/413 instead of
+  a generic 500; the temp upload file is deleted once its rows are in SQLite.
+- **Detection** (`client/src/utils/csvHelpers.js`, `smartDetector.js`, `storyGenerator.js`):
+  `parseNumericValue()` strips currency symbols/thousands separators/`%` so formatted numbers
+  (`"$1,234.56"`, `"45%"`) are recognized as numeric. `detectDateFormat()`/`parseDateValue()`
+  resolve a column's date format (ISO / DD-MM-YYYY / MM-DD-YYYY / month-name / unix timestamp)
+  **once per column** from a sample, rather than guessing per value — a lone `new Date(...)` call
+  can't tell "03/04/2024" apart from "13/04/2024" and silently swaps day/month for the former.
+  Fully-empty columns are excluded from chart axes rather than shown as selectable-but-empty.
+- **Upload UX** (`UploadModal.jsx`): file size is checked client-side before uploading; parse
+  warnings from the server are shown in the modal instead of silently dropped.
+
+Known, intentionally deferred: non-UTF-8 (e.g. Windows-1252) file encoding isn't sniffed — a
+cosmetic mojibake risk on a minority of exports, not a structural one, and fixing it needs a new
+dependency for low marginal value in a hackathon-scoped app.
+
+## Scroll feel & mobile
+
+- **Scroll feel**: Lenis's smoothing (`useLenis.js`) was tuned down from a 1.2s expo-out curve to
+  0.8s cubic-out, and each dashboard Act's CSS reveal transition shortened from 700ms to 300ms —
+  the two were stacking into a near-1-second lag between input and motion. The Act
+  reveal/hide state (`DashboardPage.jsx`) is now symmetric on scroll-up as well as scroll-down.
+- **Mobile**: the Particle Swarm (`ParticleSwarm.jsx`) had zero touch support (mouse-only) — it now
+  handles tap-to-filter with the same hit-testing as desktop hover/click. Act sections use `dvh`
+  instead of `vh` so the mobile browser's collapsing address bar doesn't cause layout jumps. Act
+  7's sidebar collapse toggle (which only affected anything at the `lg` breakpoint) is hidden below
+  it, and the sidebar itself is reordered to render after the charts/table on mobile. The three
+  landing-page GSAP pinned-scroll sections skip pinning below ~768px, where a multi-screen-height
+  pinned scroll is disproportionate and fights the mobile browser's dynamic toolbar.
+
 ## Docker
 
 Single image, single container, single port — serves both the API and the built React app (so a
