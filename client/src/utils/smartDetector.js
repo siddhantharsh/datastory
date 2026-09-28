@@ -23,6 +23,7 @@ export function detectColumnTypes(rows, columns) {
 
   columns.forEach((col) => {
     let numericCount = 0;
+    let nonIntegerNumericCount = 0;
     let nonNullCount = 0;
     const uniqueVals = new Set();
     const sampleRaw = [];
@@ -35,8 +36,12 @@ export function detectColumnTypes(rows, columns) {
         uniqueVals.add(strVal);
         sampleRaw.push(strVal);
 
-        if (typeof val === 'number' || (!isNaN(parseNumericValue(val)) && typeof val !== 'boolean')) {
+        const numVal = typeof val === 'number' ? val : parseNumericValue(val);
+        if (!isNaN(numVal) && typeof val !== 'boolean') {
           numericCount++;
+          if (!Number.isInteger(numVal)) {
+            nonIntegerNumericCount++;
+          }
         }
       }
     }
@@ -51,19 +56,30 @@ export function detectColumnTypes(rows, columns) {
       return;
     }
 
+    const numericRatio = numericCount / nonNullCount;
+    // A column that's almost entirely non-integer decimals is a continuous
+    // measurement (e.g. iris petal/sepal width, temperature) even when its
+    // practical range happens to produce few unique values — e.g. sepal
+    // width only ever takes ~23 distinct values across 150 flowers. The
+    // low-cardinality "categorical dimension" rule below is meant for
+    // near-always-whole-number dimensions (floor, department code, rating),
+    // so exempt columns that are mostly fractional from it.
+    const isContinuousMeasurement =
+      numericCount > 0 && numericRatio > 0.9 && nonIntegerNumericCount / numericCount > 0.3;
+
     // Classification Rules (checked in order):
     // 1. If 70%+ of values resolve to one consistent date format -> DATE
-    // 2. If < 25 unique values (including discrete numbers like floor: 1,2,3,4 or bus_id) -> CATEGORICAL
+    // 2. If < 25 unique values (and not a continuous decimal measurement) -> CATEGORICAL
+    //    (e.g. floor: 1,2,3,4 or bus_id)
     // 3. If 70%+ continuous numeric values -> NUMERIC
     // 4. Otherwise -> HIGH CARDINALITY TEXT
     const resolvedDateFormat = detectDateFormat(sampleRaw);
     if (resolvedDateFormat) {
       types[col] = 'date';
       dateFormats[col] = resolvedDateFormat;
-    } else if (uniqueVals.size < 25 && uniqueVals.size > 0) {
-      // Small number of distinct values = categorical dimension (e.g. floor, department, status, route)
+    } else if (uniqueVals.size < 25 && uniqueVals.size > 0 && !isContinuousMeasurement) {
       types[col] = 'categorical';
-    } else if (numericCount / nonNullCount > 0.7) {
+    } else if (numericRatio > 0.7) {
       types[col] = 'numeric';
     } else {
       types[col] = 'high_cardinality';
