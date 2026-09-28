@@ -40,6 +40,42 @@
     --nav-top: 14px;
   }
 
+  /* Dark mode — toggled by adding/removing .dark on <html> (see
+     useDarkMode.js). Scoped to the dashboard experience: the landing
+     page's marketing sections keep their light-only design (documented
+     limitation, not attempted this pass — see CLAUDE.md). Overrides the
+     same custom properties the light theme defines above, so anything
+     already built on var(--ink)/var(--bg)/etc (including the landing
+     page's own hand-written CSS below) picks it up for free; dashboard
+     JSX components that used raw Tailwind arbitrary hex values had those
+     swapped to reference these same variables. */
+  .dark {
+    --ink:      #f3f1ec;
+    --bg:        #171512;
+    --bg-2:      #1e1b18;
+    --panel:     #232019;
+    --panel-2:   #2a2620;
+    --line:      rgba(243, 241, 236, .14);
+    --line-2:    rgba(243, 241, 236, .08);
+
+    --fg:        #f3f1ec;
+    --fg-dim:    #c9c3b8;
+    --muted:     #b0a99d;
+    --muted-2:   #83796c;
+  }
+
+  /* Dashboard components consistently use Tailwind's bg-white keyword class
+     (not an arbitrary hex value) for card/panel surfaces, so it can't be
+     swapped to var(--panel) the same way the bracketed hex values were —
+     override the compiled utility class itself within .dark scope instead.
+     !important is required here: this rule lives in @layer base, and CSS
+     cascade layers make ANY rule in Tailwind's utilities layer win over
+     base regardless of selector specificity — .dark .bg-white (2 classes)
+     would otherwise still lose to the single-class .bg-white utility. */
+  .dark .bg-white {
+    background-color: var(--panel) !important;
+  }
+
   html, body {
     height: 100%;
     background-color: var(--bg);

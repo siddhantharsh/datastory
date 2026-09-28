@@ -88,22 +88,22 @@ export function DataTableExplorer({ rows = [], columns = [], meta = {} }) {
   };
 
   return (
-    <div className="p-7 bg-white border border-[#161513]/12 rounded-[18px] card-shadow mb-8 transition-all">
+    <div className="p-7 bg-white border border-[var(--ink)]/12 rounded-[18px] card-shadow mb-8 transition-all">
       
       {/* Top Header & Search Bar */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 pb-4 border-b border-[#161513]/8">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 pb-4 border-b border-[var(--ink)]/8">
         <div>
-          <h3 className="font-serif font-normal text-2xl text-[#161513]">
+          <h3 className="font-serif font-normal text-2xl text-[var(--ink)]">
             Data Table Explorer
           </h3>
-          <p className="font-mono text-xs text-[#9b958c] uppercase tracking-wider mt-0.5">
+          <p className="font-mono text-xs text-[var(--muted-2)] uppercase tracking-wider mt-0.5">
             Showing {sortedRows.length.toLocaleString()} of {rows.length.toLocaleString()} rows
           </p>
         </div>
 
         {/* Global Search Input */}
         <div className="relative w-full sm:w-80">
-          <Search className="w-4 h-4 text-[#9b958c] absolute left-3.5 top-1/2 -translate-y-1/2" />
+          <Search className="w-4 h-4 text-[var(--muted-2)] absolute left-3.5 top-1/2 -translate-y-1/2" />
           <input
             type="text"
             placeholder="Search across all attributes..."
@@ -112,26 +112,26 @@ export function DataTableExplorer({ rows = [], columns = [], meta = {} }) {
               setSearchTerm(e.target.value);
               setCurrentPage(1);
             }}
-            className="w-full pl-10 pr-4 py-2 text-xs font-sans bg-[#faf9f7] border border-[#161513]/15 rounded-[10px] text-[#161513] focus:outline-none focus:border-[#b5470b]"
+            className="w-full pl-10 pr-4 py-2 text-xs font-sans bg-[var(--bg)] border border-[var(--ink)]/15 rounded-[10px] text-[var(--ink)] focus:outline-none focus:border-[#b5470b]"
           />
         </div>
       </div>
 
       {/* Paginated Table Container */}
-      <div className="overflow-x-auto border border-[#161513]/12 rounded-[12px] bg-white">
+      <div className="overflow-x-auto border border-[var(--ink)]/12 rounded-[12px] bg-white">
         <table className="w-full text-left border-collapse font-sans text-xs">
           
           {/* Header Row */}
           <thead>
-            <tr className="bg-[#faf9f7] border-b border-[#161513]/12 text-[#6f6a62] font-mono text-[11px] uppercase tracking-wider">
+            <tr className="bg-[var(--bg)] border-b border-[var(--ink)]/12 text-[var(--muted)] font-mono text-[11px] uppercase tracking-wider">
               {columns.map((col, idx) => {
                 const isSorted = sortCol === col;
                 return (
                   <th
                     key={col}
                     onClick={() => handleSort(col)}
-                    className={`p-3.5 font-semibold cursor-pointer select-none hover:text-[#161513] transition-colors whitespace-nowrap ${
-                      idx === 0 ? 'sticky left-0 bg-[#faf9f7] z-10' : ''
+                    className={`p-3.5 font-semibold cursor-pointer select-none hover:text-[var(--ink)] transition-colors whitespace-nowrap ${
+                      idx === 0 ? 'sticky left-0 bg-[var(--bg)] z-10' : ''
                     }`}
                   >
                     <div className="flex items-center gap-1.5">
@@ -153,12 +153,12 @@ export function DataTableExplorer({ rows = [], columns = [], meta = {} }) {
           </thead>
 
           {/* Table Body */}
-          <tbody className="divide-y divide-[#161513]/6">
+          <tbody className="divide-y divide-[var(--ink)]/6">
             {paginatedRows.length > 0 ? (
               paginatedRows.map((row, rIdx) => (
                 <tr
                   key={rIdx}
-                  className="hover:bg-[#faf9f7] transition-colors text-[#161513]"
+                  className="hover:bg-[var(--bg)] transition-colors text-[var(--ink)]"
                 >
                   {columns.map((col, cIdx) => (
                     <td
@@ -174,7 +174,7 @@ export function DataTableExplorer({ rows = [], columns = [], meta = {} }) {
               ))
             ) : (
               <tr>
-                <td colSpan={columns.length} className="p-8 text-center text-[#9b958c] font-mono text-xs">
+                <td colSpan={columns.length} className="p-8 text-center text-[var(--muted-2)] font-mono text-xs">
                   No matching data records found.
                 </td>
               </tr>
@@ -184,7 +184,7 @@ export function DataTableExplorer({ rows = [], columns = [], meta = {} }) {
       </div>
 
       {/* Pagination Controls */}
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-4 pt-2 text-xs font-mono text-[#6f6a62]">
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-4 pt-2 text-xs font-mono text-[var(--muted)]">
         <div>
           Page {currentPage} of {totalPages} ({paginatedRows.length} rows shown)
         </div>
@@ -193,19 +193,19 @@ export function DataTableExplorer({ rows = [], columns = [], meta = {} }) {
           <button
             onClick={() => handlePageChange(currentPage - 1)}
             disabled={currentPage === 1}
-            className="p-1.5 rounded-[8px] border border-[#161513]/15 hover:bg-[#faf9f7] disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
+            className="p-1.5 rounded-[8px] border border-[var(--ink)]/15 hover:bg-[var(--bg)] disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
           >
             <ChevronLeft className="w-4 h-4" />
           </button>
 
-          <span className="px-3.5 py-1 bg-[#faf9f7] border border-[#161513]/15 rounded-[8px] font-semibold text-[#161513]">
+          <span className="px-3.5 py-1 bg-[var(--bg)] border border-[var(--ink)]/15 rounded-[8px] font-semibold text-[var(--ink)]">
             {currentPage}
           </span>
 
           <button
             onClick={() => handlePageChange(currentPage + 1)}
             disabled={currentPage === totalPages}
-            className="p-1.5 rounded-[8px] border border-[#161513]/15 hover:bg-[#faf9f7] disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
+            className="p-1.5 rounded-[8px] border border-[var(--ink)]/15 hover:bg-[var(--bg)] disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
           >
             <ChevronRight className="w-4 h-4" />
           </button>

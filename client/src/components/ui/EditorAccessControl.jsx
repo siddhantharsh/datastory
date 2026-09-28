@@ -49,7 +49,7 @@ export function EditorAccessControl() {
       <button
         onClick={() => setIsOpen(true)}
         title="Unlock Editor mode to upload/delete datasets"
-        className="inline-flex items-center gap-1.5 px-3 py-2 rounded-full border border-[#161513]/15 bg-white text-[#6f6a62] text-xs font-mono font-semibold hover:bg-[#faf9f7] transition-colors cursor-pointer"
+        className="inline-flex items-center gap-1.5 px-3 py-2 rounded-full border border-[var(--ink)]/15 bg-white text-[var(--muted)] text-xs font-mono font-semibold hover:bg-[var(--bg)] transition-colors cursor-pointer"
       >
         <Lock className="w-3.5 h-3.5" />
         <span>Viewer</span>
@@ -57,7 +57,7 @@ export function EditorAccessControl() {
 
       <Modal isOpen={isOpen} onClose={() => setIsOpen(false)} title="Unlock Editor Mode" maxWidth="max-w-sm">
         <form onSubmit={handleSubmit} className="space-y-4">
-          <p className="text-xs text-[#6f6a62]">
+          <p className="text-xs text-[var(--muted)]">
             Viewers can browse, filter, and export data. Enter the editor passcode to also
             upload and delete datasets.
           </p>

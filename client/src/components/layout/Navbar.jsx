@@ -2,12 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { Button } from '../ui/Button';
 import { UploadModal } from '../ui/UploadModal';
 import { EditorAccessControl } from '../ui/EditorAccessControl';
-import { Upload, ArrowRight, BarChart2 } from 'lucide-react';
+import { Upload, ArrowRight, BarChart2, Moon, Sun } from 'lucide-react';
 import { useDataset } from '../../context/DatasetContext';
+import { useDarkMode } from '../../hooks/useDarkMode';
 
 export function Navbar({ currentPage, setCurrentPage }) {
   const { datasets, activeDataset, selectDataset, isEditor } = useDataset();
   const [isUploadOpen, setIsUploadOpen] = useState(false);
+  const [isDark, setIsDark] = useDarkMode(currentPage === 'dashboard');
   const [scrollProgress, setScrollProgress] = useState(0);
   const [isVisible, setIsVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
@@ -52,7 +54,7 @@ export function Navbar({ currentPage, setCurrentPage }) {
           isVisible ? 'translate-y-0' : '-translate-y-full'
         } ${
           lastScrollY > 20
-            ? 'bg-[#faf9f7]/85 backdrop-blur-md border-b border-[#161513]/10 py-3 shadow-xs'
+            ? 'bg-[var(--bg)]/85 backdrop-blur-md border-b border-[var(--ink)]/10 py-3 shadow-xs'
             : 'bg-transparent py-5'
         }`}
       >
@@ -62,13 +64,13 @@ export function Navbar({ currentPage, setCurrentPage }) {
             onClick={() => setCurrentPage('landing')}
             className="flex items-center gap-3 cursor-pointer group"
           >
-            <span className="font-serif font-bold text-2xl tracking-tight text-[#161513] group-hover:text-[#b5470b] transition-colors">
+            <span className="font-serif font-bold text-2xl tracking-tight text-[var(--ink)] group-hover:text-[#b5470b] transition-colors">
               DataStory
             </span>
           </div>
 
           {/* Middle Breadcrumb section indicator */}
-          <div className="hidden md:flex items-center text-xs font-mono text-[#6f6a62] uppercase tracking-wider">
+          <div className="hidden md:flex items-center text-xs font-mono text-[var(--muted)] uppercase tracking-wider">
             {currentPage === 'landing' ? (
               <span>// 01 · Data Storytelling Studio</span>
             ) : (
@@ -89,6 +91,13 @@ export function Navbar({ currentPage, setCurrentPage }) {
               </Button>
             ) : (
               <>
+                <button
+                  onClick={() => setIsDark(!isDark)}
+                  title={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
+                  className="p-2.5 rounded-full border border-[var(--line)] bg-[var(--panel)] text-[var(--muted)] hover:text-[var(--ink)] transition-colors cursor-pointer"
+                >
+                  {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+                </button>
                 <EditorAccessControl />
                 {isEditor && (
                   <Button

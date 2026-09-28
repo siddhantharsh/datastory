@@ -77,9 +77,9 @@ export function DatasetHeader({ onBackToHome, filteredRows = [] }) {
 
   if (!activeDataset && loading) {
     return (
-      <div className="bg-white rounded-[24px] border border-[#161513]/10 p-8 shadow-sm mb-8 animate-pulse">
-        <div className="h-7 w-56 bg-[#161513]/10 rounded mb-3" />
-        <div className="h-4 w-36 bg-[#161513]/5 rounded" />
+      <div className="bg-white rounded-[24px] border border-[var(--ink)]/10 p-8 shadow-sm mb-8 animate-pulse">
+        <div className="h-7 w-56 bg-[var(--ink)]/10 rounded mb-3" />
+        <div className="h-4 w-36 bg-[var(--ink)]/5 rounded" />
       </div>
     );
   }
@@ -89,7 +89,7 @@ export function DatasetHeader({ onBackToHome, filteredRows = [] }) {
 
   return (
     <>
-      <div className="bg-white rounded-[24px] border border-[#161513]/10 p-8 shadow-sm mb-12 flex flex-col lg:flex-row lg:items-center justify-between gap-6 transition-all">
+      <div className="bg-white rounded-[24px] border border-[var(--ink)]/10 p-8 shadow-sm mb-12 flex flex-col lg:flex-row lg:items-center justify-between gap-6 transition-all">
         
         {/* Left Side: Back Home + Title & Metadata */}
         <div>
@@ -101,28 +101,28 @@ export function DatasetHeader({ onBackToHome, filteredRows = [] }) {
               <ArrowLeft className="w-3.5 h-3.5 group-hover:-translate-x-0.5 transition-transform" />
               <span>Back to home</span>
             </button>
-            <span className="text-[#9b958c] font-mono text-xs">02 · DATASTORY DASHBOARD</span>
+            <span className="text-[var(--muted-2)] font-mono text-xs">02 · DATASTORY DASHBOARD</span>
           </div>
 
           <div className="flex items-center gap-4 mb-2">
-            <h1 className="font-serif font-normal text-3xl sm:text-4xl text-[#161513] tracking-tight">
+            <h1 className="font-serif font-normal text-3xl sm:text-4xl text-[var(--ink)] tracking-tight">
               {activeDataset?.name || 'Select a Dataset'}
             </h1>
-            <span className="text-xs font-mono text-[#6f6a62] uppercase tracking-wider font-medium">
+            <span className="text-xs font-mono text-[var(--muted)] uppercase tracking-wider font-medium">
               {activeDataset?.isSample ? 'Sample Dataset' : 'Custom CSV'}
             </span>
           </div>
 
-          <div className="flex flex-wrap items-center gap-3 text-xs font-mono text-[#6f6a62]">
-            <span className="font-medium text-[#161513]">
+          <div className="flex flex-wrap items-center gap-3 text-xs font-mono text-[var(--muted)]">
+            <span className="font-medium text-[var(--ink)]">
               {rowsCount.toLocaleString()} Total Records
             </span>
-            <span className="text-[#9b958c]">·</span>
-            <span className="font-medium text-[#161513]">{colsCount} Attributes</span>
+            <span className="text-[var(--muted-2)]">·</span>
+            <span className="font-medium text-[var(--ink)]">{colsCount} Attributes</span>
             {activeDataset?.filename && (
               <>
-                <span className="text-[#9b958c]">·</span>
-                <span className="text-[#6f6a62]">{activeDataset.filename}</span>
+                <span className="text-[var(--muted-2)]">·</span>
+                <span className="text-[var(--muted)]">{activeDataset.filename}</span>
               </>
             )}
           </div>
@@ -132,12 +132,12 @@ export function DatasetHeader({ onBackToHome, filteredRows = [] }) {
         <div className="print:hidden flex flex-wrap items-center gap-3">
           
           {/* Dataset Selector Dropdown */}
-          <div className="flex items-center bg-[#faf9f7] border border-[#161513]/15 rounded-[12px] px-3.5 py-2.5 text-xs">
+          <div className="flex items-center bg-[var(--bg)] border border-[var(--ink)]/15 rounded-[12px] px-3.5 py-2.5 text-xs">
             <Database className="w-4 h-4 text-[#b5470b] mr-2 shrink-0" />
             <select
               value={activeDataset?.id || ''}
               onChange={(e) => selectDataset(e.target.value)}
-              className="bg-transparent text-xs font-mono font-semibold text-[#161513] focus:outline-none cursor-pointer pr-2"
+              className="bg-transparent text-xs font-mono font-semibold text-[var(--ink)] focus:outline-none cursor-pointer pr-2"
             >
               {datasets.map((d) => (
                 <option key={d.id} value={d.id} className="bg-white font-sans text-xs">
@@ -150,7 +150,7 @@ export function DatasetHeader({ onBackToHome, filteredRows = [] }) {
           {isEditor && (
             <button
               onClick={() => setIsUploadOpen(true)}
-              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-[12px] border border-[#161513]/15 bg-white text-xs font-sans font-medium text-[#161513] hover:bg-[#faf9f7] transition-all cursor-pointer"
+              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-[12px] border border-[var(--ink)]/15 bg-white text-xs font-sans font-medium text-[var(--ink)] hover:bg-[var(--bg)] transition-all cursor-pointer"
             >
               <Upload className="w-4 h-4 text-[#b5470b]" />
               <span>Upload CSV</span>
@@ -161,7 +161,7 @@ export function DatasetHeader({ onBackToHome, filteredRows = [] }) {
           <button
             onClick={handleCopyLink}
             title="Copy a link to this exact filtered view"
-            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-[12px] border border-[#161513]/15 bg-white text-xs font-sans font-medium text-[#161513] hover:bg-[#faf9f7] transition-all cursor-pointer"
+            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-[12px] border border-[var(--ink)]/15 bg-white text-xs font-sans font-medium text-[var(--ink)] hover:bg-[var(--bg)] transition-all cursor-pointer"
           >
             {linkCopied ? (
               <>
@@ -188,24 +188,24 @@ export function DatasetHeader({ onBackToHome, filteredRows = [] }) {
             </button>
 
             {isExportOpen && (
-              <div className="absolute right-0 mt-2 w-56 bg-white border border-[#161513]/15 rounded-[14px] shadow-xl z-50 py-2 font-sans text-xs">
+              <div className="absolute right-0 mt-2 w-56 bg-white border border-[var(--ink)]/15 rounded-[14px] shadow-xl z-50 py-2 font-sans text-xs">
                 <button
                   onClick={() => handleExportCSV(filteredRows, 'filtered')}
-                  className="w-full text-left px-4 py-2.5 hover:bg-[#faf9f7] text-[#161513] flex items-center gap-2.5 cursor-pointer font-medium"
+                  className="w-full text-left px-4 py-2.5 hover:bg-[var(--bg)] text-[var(--ink)] flex items-center gap-2.5 cursor-pointer font-medium"
                 >
                   <Table className="w-4 h-4 text-[#b5470b]" />
                   <span>Export filtered CSV ({filteredRows.length} rows)</span>
                 </button>
                 <button
                   onClick={() => handleExportCSV(activeDataset?.rows || [], 'full')}
-                  className="w-full text-left px-4 py-2.5 hover:bg-[#faf9f7] text-[#161513] flex items-center gap-2.5 cursor-pointer font-medium border-t border-[#161513]/8"
+                  className="w-full text-left px-4 py-2.5 hover:bg-[var(--bg)] text-[var(--ink)] flex items-center gap-2.5 cursor-pointer font-medium border-t border-[var(--ink)]/8"
                 >
                   <FileSpreadsheet className="w-4 h-4 text-[#b5470b]" />
                   <span>Export full CSV ({rowsCount} rows)</span>
                 </button>
                 <button
                   onClick={() => handleExportJSON(filteredRows)}
-                  className="w-full text-left px-4 py-2.5 hover:bg-[#faf9f7] text-[#161513] flex items-center gap-2.5 cursor-pointer font-medium border-t border-[#161513]/8"
+                  className="w-full text-left px-4 py-2.5 hover:bg-[var(--bg)] text-[var(--ink)] flex items-center gap-2.5 cursor-pointer font-medium border-t border-[var(--ink)]/8"
                 >
                   <FileCode className="w-4 h-4 text-[#b5470b]" />
                   <span>Export as JSON</span>
@@ -213,7 +213,7 @@ export function DatasetHeader({ onBackToHome, filteredRows = [] }) {
                 <button
                   onClick={() => { setIsExportOpen(false); window.print(); }}
                   title="Opens your browser's print dialog — choose 'Save as PDF' as the destination"
-                  className="w-full text-left px-4 py-2.5 hover:bg-[#faf9f7] text-[#161513] flex items-center gap-2.5 cursor-pointer font-medium border-t border-[#161513]/8"
+                  className="w-full text-left px-4 py-2.5 hover:bg-[var(--bg)] text-[var(--ink)] flex items-center gap-2.5 cursor-pointer font-medium border-t border-[var(--ink)]/8"
                 >
                   <FileSpreadsheet className="w-4 h-4 text-[#b5470b]" />
                   <span>Export Story as PDF</span>

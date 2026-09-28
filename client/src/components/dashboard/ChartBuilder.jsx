@@ -21,18 +21,18 @@ function CustomTooltip({ active, payload, label }) {
   if (!active || !payload || !payload.length) return null;
 
   return (
-    <div className="bg-white border border-[#161513]/15 p-3.5 rounded-[12px] shadow-xl text-xs font-sans">
-      <p className="font-mono font-semibold text-[#161513] mb-2 pb-1 border-b border-[#161513]/10">
+    <div className="bg-white border border-[var(--ink)]/15 p-3.5 rounded-[12px] shadow-xl text-xs font-sans">
+      <p className="font-mono font-semibold text-[var(--ink)] mb-2 pb-1 border-b border-[var(--ink)]/10">
         {label}
       </p>
       <div className="space-y-1.5">
         {payload.map((entry, idx) => (
           <div key={idx} className="flex items-center justify-between gap-5">
-            <span className="flex items-center gap-1.5 font-medium text-[#6f6a62]">
+            <span className="flex items-center gap-1.5 font-medium text-[var(--muted)]">
               <span className="w-2.5 h-2.5 rounded-full inline-block" style={{ backgroundColor: entry.color }} />
               {formatColName(entry.name || entry.dataKey)}:
             </span>
-            <span className="font-mono font-bold text-[#161513]">
+            <span className="font-mono font-bold text-[var(--ink)]">
               {typeof entry.value === 'number' ? entry.value.toLocaleString() : entry.value}
             </span>
           </div>
@@ -168,25 +168,25 @@ export function ChartBuilder({ chart1Config, chart2Config, chart3Config, rows = 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         
         {/* CHART 1: BAR CHART */}
-        <div className="p-7 bg-white border border-[#161513]/12 rounded-[20px] shadow-sm flex flex-col justify-between overflow-hidden transition-all">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6 pb-4 border-b border-[#161513]/8">
+        <div className="p-7 bg-white border border-[var(--ink)]/12 rounded-[20px] shadow-sm flex flex-col justify-between overflow-hidden transition-all">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6 pb-4 border-b border-[var(--ink)]/8">
             <div className="min-w-0 flex-1">
-              <h3 className="font-serif font-normal text-2xl text-[#161513] truncate">
+              <h3 className="font-serif font-normal text-2xl text-[var(--ink)] truncate">
                 {formatColName(activeC1Y)} by {formatColName(activeC1X)}
               </h3>
-              <p className="font-mono text-xs text-[#9b958c] uppercase tracking-wider mt-0.5">
+              <p className="font-mono text-xs text-[var(--muted-2)] uppercase tracking-wider mt-0.5">
                 Bar Chart · {rows.length.toLocaleString()} Filtered Records
               </p>
             </div>
 
             {/* Interactive Axis Dropdowns with Strict Width Constraints */}
             <div className="flex items-center gap-2 shrink-0">
-              <div className="flex items-center bg-[#faf9f7] border border-[#161513]/15 rounded-[8px] px-2 py-1 text-xs max-w-[140px] truncate">
-                <span className="font-mono text-[10px] uppercase text-[#9b958c] mr-1 font-bold shrink-0">X:</span>
+              <div className="flex items-center bg-[var(--bg)] border border-[var(--ink)]/15 rounded-[8px] px-2 py-1 text-xs max-w-[140px] truncate">
+                <span className="font-mono text-[10px] uppercase text-[var(--muted-2)] mr-1 font-bold shrink-0">X:</span>
                 <select
                   value={activeC1X}
                   onChange={(e) => setChart1X(e.target.value)}
-                  className="bg-transparent text-xs font-mono font-medium text-[#161513] focus:outline-none cursor-pointer truncate w-full"
+                  className="bg-transparent text-xs font-mono font-medium text-[var(--ink)] focus:outline-none cursor-pointer truncate w-full"
                 >
                   {availableCols.map((c) => (
                     <option key={c} value={c}>
@@ -196,12 +196,12 @@ export function ChartBuilder({ chart1Config, chart2Config, chart3Config, rows = 
                 </select>
               </div>
 
-              <div className="flex items-center bg-[#faf9f7] border border-[#161513]/15 rounded-[8px] px-2 py-1 text-xs max-w-[140px] truncate">
-                <span className="font-mono text-[10px] uppercase text-[#9b958c] mr-1 font-bold shrink-0">Y:</span>
+              <div className="flex items-center bg-[var(--bg)] border border-[var(--ink)]/15 rounded-[8px] px-2 py-1 text-xs max-w-[140px] truncate">
+                <span className="font-mono text-[10px] uppercase text-[var(--muted-2)] mr-1 font-bold shrink-0">Y:</span>
                 <select
                   value={activeC1Y}
                   onChange={(e) => setChart1Y(e.target.value)}
-                  className="bg-transparent text-xs font-mono font-medium text-[#161513] focus:outline-none cursor-pointer truncate w-full"
+                  className="bg-transparent text-xs font-mono font-medium text-[var(--ink)] focus:outline-none cursor-pointer truncate w-full"
                 >
                   {availableNumericCols.map((c) => (
                     <option key={c} value={c}>
@@ -246,25 +246,25 @@ export function ChartBuilder({ chart1Config, chart2Config, chart3Config, rows = 
         </div>
 
         {/* CHART 2: LINE CHART */}
-        <div className="p-7 bg-white border border-[#161513]/12 rounded-[20px] shadow-sm flex flex-col justify-between overflow-hidden transition-all">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6 pb-4 border-b border-[#161513]/8">
+        <div className="p-7 bg-white border border-[var(--ink)]/12 rounded-[20px] shadow-sm flex flex-col justify-between overflow-hidden transition-all">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6 pb-4 border-b border-[var(--ink)]/8">
             <div className="min-w-0 flex-1">
-              <h3 className="font-serif font-normal text-2xl text-[#161513] truncate">
+              <h3 className="font-serif font-normal text-2xl text-[var(--ink)] truncate">
                 {formatColName(activeC2Y)} Trajectory
               </h3>
-              <p className="font-mono text-xs text-[#9b958c] uppercase tracking-wider mt-0.5">
+              <p className="font-mono text-xs text-[var(--muted-2)] uppercase tracking-wider mt-0.5">
                 Line Chart · Trend over {formatColName(activeC2X)}
               </p>
             </div>
 
             {/* Interactive Axis Dropdowns with Strict Width Constraints */}
             <div className="flex items-center gap-2 shrink-0">
-              <div className="flex items-center bg-[#faf9f7] border border-[#161513]/15 rounded-[8px] px-2 py-1 text-xs max-w-[140px] truncate">
-                <span className="font-mono text-[10px] uppercase text-[#9b958c] mr-1 font-bold shrink-0">X:</span>
+              <div className="flex items-center bg-[var(--bg)] border border-[var(--ink)]/15 rounded-[8px] px-2 py-1 text-xs max-w-[140px] truncate">
+                <span className="font-mono text-[10px] uppercase text-[var(--muted-2)] mr-1 font-bold shrink-0">X:</span>
                 <select
                   value={activeC2X}
                   onChange={(e) => setChart2X(e.target.value)}
-                  className="bg-transparent text-xs font-mono font-medium text-[#161513] focus:outline-none cursor-pointer truncate w-full"
+                  className="bg-transparent text-xs font-mono font-medium text-[var(--ink)] focus:outline-none cursor-pointer truncate w-full"
                 >
                   {availableCols.map((c) => (
                     <option key={c} value={c}>
@@ -274,12 +274,12 @@ export function ChartBuilder({ chart1Config, chart2Config, chart3Config, rows = 
                 </select>
               </div>
 
-              <div className="flex items-center bg-[#faf9f7] border border-[#161513]/15 rounded-[8px] px-2 py-1 text-xs max-w-[140px] truncate">
-                <span className="font-mono text-[10px] uppercase text-[#9b958c] mr-1 font-bold shrink-0">Y:</span>
+              <div className="flex items-center bg-[var(--bg)] border border-[var(--ink)]/15 rounded-[8px] px-2 py-1 text-xs max-w-[140px] truncate">
+                <span className="font-mono text-[10px] uppercase text-[var(--muted-2)] mr-1 font-bold shrink-0">Y:</span>
                 <select
                   value={activeC2Y}
                   onChange={(e) => setChart2Y(e.target.value)}
-                  className="bg-transparent text-xs font-mono font-medium text-[#161513] focus:outline-none cursor-pointer truncate w-full"
+                  className="bg-transparent text-xs font-mono font-medium text-[var(--ink)] focus:outline-none cursor-pointer truncate w-full"
                 >
                   {availableNumericCols.map((c) => (
                     <option key={c} value={c}>
@@ -329,13 +329,13 @@ export function ChartBuilder({ chart1Config, chart2Config, chart3Config, rows = 
       </div>
 
       {/* ROW 3: 1 FULL-WIDTH AREA CHART */}
-      <div className="p-7 bg-white border border-[#161513]/12 rounded-[20px] shadow-sm overflow-hidden transition-all">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 pb-4 border-b border-[#161513]/8">
+      <div className="p-7 bg-white border border-[var(--ink)]/12 rounded-[20px] shadow-sm overflow-hidden transition-all">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 pb-4 border-b border-[var(--ink)]/8">
           <div>
-            <h3 className="font-serif font-normal text-2xl text-[#161513]">
+            <h3 className="font-serif font-normal text-2xl text-[var(--ink)]">
               Multi-Metric Overview ({formatColName(activeC3X)})
             </h3>
-            <p className="font-mono text-xs text-[#9b958c] uppercase tracking-wider mt-0.5">
+            <p className="font-mono text-xs text-[var(--muted-2)] uppercase tracking-wider mt-0.5">
               Full-Width Area Chart · Click Series Badges to Toggle Overlay
             </p>
           </div>
@@ -352,7 +352,7 @@ export function ChartBuilder({ chart1Config, chart2Config, chart3Config, rows = 
                   onClick={() => toggleSeries(col)}
                   className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono transition-all cursor-pointer ${
                     !isHidden
-                      ? 'bg-white border border-[#161513]/15 text-[#161513] shadow-xs'
+                      ? 'bg-white border border-[var(--ink)]/15 text-[var(--ink)] shadow-xs'
                       : 'opacity-40 line-through bg-gray-100'
                   }`}
                 >

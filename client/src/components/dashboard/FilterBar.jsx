@@ -134,12 +134,12 @@ export function FilterBar({ meta, rows, filters, onFilterChange, onClearFilters,
   }
 
   return (
-    <div className="sticky top-0 z-40 bg-[#faf9f7]/95 backdrop-blur-md border-y border-[#161513]/12 py-3.5 px-6 -mx-6 mb-8 transition-colors">
+    <div className="sticky top-0 z-40 bg-[var(--bg)]/95 backdrop-blur-md border-y border-[var(--ink)]/12 py-3.5 px-6 -mx-6 mb-8 transition-colors">
       <div className="max-w-[1280px] mx-auto flex flex-col gap-3">
         
         {/* Controls Row */}
         <div className="flex flex-wrap items-center gap-3" ref={dropdownRef}>
-          <div className="flex items-center gap-2 text-xs font-mono font-semibold uppercase tracking-wider text-[#161513] mr-2 shrink-0">
+          <div className="flex items-center gap-2 text-xs font-mono font-semibold uppercase tracking-wider text-[var(--ink)] mr-2 shrink-0">
             <Filter className="w-4 h-4 text-[#b5470b]" />
             <span>Filter Engine</span>
           </div>
@@ -157,7 +157,7 @@ export function FilterBar({ meta, rows, filters, onFilterChange, onClearFilters,
                   className={`inline-flex items-center gap-2 px-3.5 py-2 rounded-[10px] border text-xs font-sans font-medium transition-all cursor-pointer shadow-xs ${
                     selected.length > 0
                       ? 'bg-[#b5470b] border-[#b5470b] text-white font-semibold'
-                      : 'bg-white border-[#161513]/15 text-[#161513] hover:bg-[#faf9f7]'
+                      : 'bg-white border-[var(--ink)]/15 text-[var(--ink)] hover:bg-[var(--bg)]'
                   }`}
                 >
                   <span className="truncate max-w-[140px]">{formatColName(col)}</span>
@@ -170,8 +170,8 @@ export function FilterBar({ meta, rows, filters, onFilterChange, onClearFilters,
                 </button>
 
                 {isOpen && (
-                  <div className="absolute left-0 mt-2 w-64 max-w-[90vw] max-h-72 overflow-y-auto bg-white border border-[#161513]/15 rounded-[12px] shadow-xl z-50 p-2 text-xs space-y-1">
-                    <div className="font-mono text-[10px] uppercase tracking-wider text-[#9b958c] px-2 py-1.5 border-b border-[#161513]/8 font-semibold flex justify-between">
+                  <div className="absolute left-0 mt-2 w-64 max-w-[90vw] max-h-72 overflow-y-auto bg-white border border-[var(--ink)]/15 rounded-[12px] shadow-xl z-50 p-2 text-xs space-y-1">
+                    <div className="font-mono text-[10px] uppercase tracking-wider text-[var(--muted-2)] px-2 py-1.5 border-b border-[var(--ink)]/8 font-semibold flex justify-between">
                       <span className="truncate">Filter by {formatColName(col)}</span>
                       {selected.length > 0 && (
                         <button
@@ -193,15 +193,15 @@ export function FilterBar({ meta, rows, filters, onFilterChange, onClearFilters,
                         <div
                           key={opt.value}
                           onClick={() => handleCategoryToggle(col, opt.value)}
-                          className="flex items-center justify-between px-2.5 py-1.5 rounded-[8px] hover:bg-[#faf9f7] cursor-pointer text-[#161513] transition-colors"
+                          className="flex items-center justify-between px-2.5 py-1.5 rounded-[8px] hover:bg-[var(--bg)] cursor-pointer text-[var(--ink)] transition-colors"
                         >
                           <div className="flex items-center gap-2.5 truncate">
-                            <div className={`w-4 h-4 rounded border flex items-center justify-center transition-colors shrink-0 ${isChecked ? 'bg-[#b5470b] border-[#b5470b] text-white' : 'border-[#161513]/30 bg-white'}`}>
+                            <div className={`w-4 h-4 rounded border flex items-center justify-center transition-colors shrink-0 ${isChecked ? 'bg-[#b5470b] border-[#b5470b] text-white' : 'border-[var(--ink)]/30 bg-white'}`}>
                               {isChecked && <Check className="w-3 h-3 stroke-[3]" />}
                             </div>
                             <span className="truncate font-sans font-medium">{opt.value}</span>
                           </div>
-                          <span className="font-mono text-[10px] text-[#9b958c] shrink-0 ml-2">({opt.count})</span>
+                          <span className="font-mono text-[10px] text-[var(--muted-2)] shrink-0 ml-2">({opt.count})</span>
                         </div>
                       );
                     })}
@@ -213,20 +213,20 @@ export function FilterBar({ meta, rows, filters, onFilterChange, onClearFilters,
 
           {/* Date Range Picker if Date Col Exists and Enabled */}
           {dateCol && (displayColumns.length === 0 || displayColumns.includes(dateCol)) && (
-            <div className="flex items-center gap-2 bg-white border border-[#161513]/15 rounded-[10px] px-3 py-1.5 text-xs shadow-xs">
+            <div className="flex items-center gap-2 bg-white border border-[var(--ink)]/15 rounded-[10px] px-3 py-1.5 text-xs shadow-xs">
               <Calendar className="w-3.5 h-3.5 text-[#b5470b] shrink-0" />
               <input
                 type="date"
                 value={filters.dateRange?.start || ''}
                 onChange={(e) => handleDateChange('start', e.target.value)}
-                className="bg-transparent text-xs font-mono text-[#161513] focus:outline-none cursor-pointer"
+                className="bg-transparent text-xs font-mono text-[var(--ink)] focus:outline-none cursor-pointer"
               />
-              <span className="text-[#9b958c] font-mono text-[11px]">to</span>
+              <span className="text-[var(--muted-2)] font-mono text-[11px]">to</span>
               <input
                 type="date"
                 value={filters.dateRange?.end || ''}
                 onChange={(e) => handleDateChange('end', e.target.value)}
-                className="bg-transparent text-xs font-mono text-[#161513] focus:outline-none cursor-pointer"
+                className="bg-transparent text-xs font-mono text-[var(--ink)] focus:outline-none cursor-pointer"
               />
             </div>
           )}
@@ -235,23 +235,23 @@ export function FilterBar({ meta, rows, filters, onFilterChange, onClearFilters,
           {activeNumericCols.slice(0, 2).map((col) => {
             const range = filters.numeric?.[col] || [null, null];
             return (
-              <div key={col} className="flex items-center gap-1.5 bg-white border border-[#161513]/15 rounded-[10px] px-3 py-1.5 text-xs shadow-xs">
+              <div key={col} className="flex items-center gap-1.5 bg-white border border-[var(--ink)]/15 rounded-[10px] px-3 py-1.5 text-xs shadow-xs">
                 <Sliders className="w-3.5 h-3.5 text-[#b5470b] shrink-0" />
-                <span className="font-mono text-[11px] text-[#6f6a62] font-semibold truncate max-w-[100px]">{formatColName(col)}:</span>
+                <span className="font-mono text-[11px] text-[var(--muted)] font-semibold truncate max-w-[100px]">{formatColName(col)}:</span>
                 <input
                   type="number"
                   placeholder="Min"
                   value={range[0] ?? ''}
                   onChange={(e) => handleNumericRangeChange(col, 'min', e.target.value)}
-                  className="w-16 bg-transparent text-xs font-mono text-[#161513] focus:outline-none border-b border-transparent focus:border-[#b5470b]"
+                  className="w-16 bg-transparent text-xs font-mono text-[var(--ink)] focus:outline-none border-b border-transparent focus:border-[#b5470b]"
                 />
-                <span className="text-[#9b958c]">-</span>
+                <span className="text-[var(--muted-2)]">-</span>
                 <input
                   type="number"
                   placeholder="Max"
                   value={range[1] ?? ''}
                   onChange={(e) => handleNumericRangeChange(col, 'max', e.target.value)}
-                  className="w-16 bg-transparent text-xs font-mono text-[#161513] focus:outline-none border-b border-transparent focus:border-[#b5470b]"
+                  className="w-16 bg-transparent text-xs font-mono text-[var(--ink)] focus:outline-none border-b border-transparent focus:border-[#b5470b]"
                 />
               </div>
             );
@@ -271,8 +271,8 @@ export function FilterBar({ meta, rows, filters, onFilterChange, onClearFilters,
 
         {/* Active Filter Chips Bar */}
         {activeChips.length > 0 && (
-          <div className="flex flex-wrap items-center gap-2 pt-1 border-t border-[#161513]/8">
-            <span className="font-mono text-[10px] uppercase tracking-wider text-[#9b958c] font-semibold mr-1">Active Filters:</span>
+          <div className="flex flex-wrap items-center gap-2 pt-1 border-t border-[var(--ink)]/8">
+            <span className="font-mono text-[10px] uppercase tracking-wider text-[var(--muted-2)] font-semibold mr-1">Active Filters:</span>
             {activeChips.map((chip, idx) => (
               <span
                 key={idx}

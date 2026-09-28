@@ -21,7 +21,7 @@ export function Modal({ isOpen, onClose, title, children, maxWidth = 'max-w-xl' 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#1a1a1a]/40 backdrop-blur-sm animate-fadeIn">
       <div
-        className={`bg-[#faf9f7] border border-[#1a1a1a]/15 rounded-[12px] shadow-2xl w-full ${maxWidth} overflow-hidden transform transition-all`}
+        className={`bg-[var(--bg)] border border-[#1a1a1a]/15 rounded-[12px] shadow-2xl w-full ${maxWidth} overflow-hidden transform transition-all`}
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between px-6 py-4 border-b border-[#1a1a1a]/10 bg-white">

@@ -20,9 +20,9 @@ export function Button({
 
   const variantStyles = {
     primary: 'bg-[#b5470b] text-white hover:bg-[#963a09] active:bg-[#782e07] shadow-sm',
-    secondary: 'bg-[#161513] text-white hover:bg-[#2e2c28] active:bg-[#000000]',
-    outline: 'border border-[#161513]/15 text-[#161513] hover:bg-[#161513]/5 bg-transparent',
-    ghost: 'text-[#161513] hover:bg-[#161513]/5 bg-transparent',
+    secondary: 'bg-[var(--ink)] text-white hover:bg-[#2e2c28] active:bg-[#000000]',
+    outline: 'border border-[var(--ink)]/15 text-[var(--ink)] hover:bg-[var(--ink)]/5 bg-transparent',
+    ghost: 'text-[var(--ink)] hover:bg-[var(--ink)]/5 bg-transparent',
     accentGhost: 'text-[#b5470b] hover:bg-[#b5470b]/10 bg-transparent'
   };
 

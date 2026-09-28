@@ -255,11 +255,11 @@ export function DashboardPage({ onBackToHome }) {
 
   if (loading && !activeDataset) {
     return (
-      <div className="min-h-screen bg-[#faf9f7] text-[#161513] pt-24 pb-16 px-6 transition-colors font-sans">
+      <div className="min-h-screen bg-[var(--bg)] text-[var(--ink)] pt-24 pb-16 px-6 transition-colors font-sans">
         <div className="max-w-[1280px] mx-auto flex flex-col items-center justify-center py-32">
           <div className="w-12 h-12 border-4 border-[#b5470b] border-t-transparent rounded-full animate-spin mb-6" />
           <h2 className="font-serif text-3xl mb-2">Generating Data Narrative...</h2>
-          <p className="font-mono text-xs text-[#6f6a62]">
+          <p className="font-mono text-xs text-[var(--muted)]">
             Synthesizing metrics, calculating correlation matrices, and staging slideshow narrative
           </p>
         </div>
@@ -269,7 +269,7 @@ export function DashboardPage({ onBackToHome }) {
 
   if (error || !activeDataset) {
     return (
-      <div className="min-h-screen bg-[#faf9f7] text-[#161513] pt-24 pb-16 px-6 transition-colors font-sans">
+      <div className="min-h-screen bg-[var(--bg)] text-[var(--ink)] pt-24 pb-16 px-6 transition-colors font-sans">
         <div className="max-w-[1280px] mx-auto py-16">
           <div className="p-8 bg-red-50 border border-red-200 rounded-[20px] text-red-800">
             <h3 className="font-serif font-bold text-2xl mb-1">Dataset Load Error</h3>
@@ -284,10 +284,10 @@ export function DashboardPage({ onBackToHome }) {
   const displayColumns = visibleColumns.length > 0 ? visibleColumns : allColumns;
 
   return (
-    <div className="min-h-screen bg-[#faf9f7] text-[#161513] pt-20 pb-28 px-6 transition-colors font-sans relative">
+    <div className="min-h-screen bg-[var(--bg)] text-[var(--ink)] pt-20 pb-28 px-6 transition-colors font-sans relative">
       
       {/* FLOATING MINIMALIST SLIDESHOW COUNTER */}
-      <div className="print:hidden fixed bottom-6 left-6 z-40 bg-[#161513] text-[#faf9f7] px-4 py-2 rounded-full font-mono text-xs shadow-lg flex items-center gap-2">
+      <div className="print:hidden fixed bottom-6 left-6 z-40 bg-[var(--ink)] text-[var(--bg)] px-4 py-2 rounded-full font-mono text-xs shadow-lg flex items-center gap-2">
         <span className="w-2 h-2 rounded-full bg-[#b5470b] animate-pulse" />
         <span>SLIDE {String(activeSlide).padStart(2, '0')} / 07</span>
       </div>
@@ -318,7 +318,7 @@ export function DashboardPage({ onBackToHome }) {
             {story.overview && (
               <section
                 data-slide-index="1"
-                className={`dashboard-slide min-h-[85dvh] flex flex-col justify-center pt-8 border-t border-[#161513]/10 transition-all duration-300 ease-out transform ${
+                className={`dashboard-slide min-h-[85dvh] flex flex-col justify-center pt-8 border-t border-[var(--ink)]/10 transition-all duration-300 ease-out transform ${
                   visibleSlides.has(1) ? 'opacity-100 translate-y-0 scale-100' : 'opacity-20 translate-y-12 scale-[0.98]'
                 }`}
               >
@@ -328,7 +328,7 @@ export function DashboardPage({ onBackToHome }) {
 
                 {/* Ultra-Clean Editorial Pull-Quote */}
                 <h2
-                  className="font-serif font-normal text-3xl sm:text-4xl md:text-5xl text-[#161513] leading-tight mb-12 max-w-5xl"
+                  className="font-serif font-normal text-3xl sm:text-4xl md:text-5xl text-[var(--ink)] leading-tight mb-12 max-w-5xl"
                   dangerouslySetInnerHTML={{ __html: story.overview.narrative }}
                 />
 
@@ -352,7 +352,7 @@ export function DashboardPage({ onBackToHome }) {
             {story.trend && (
               <section
                 data-slide-index="3"
-                className={`dashboard-slide min-h-[85dvh] flex flex-col justify-center pt-8 border-t border-[#161513]/10 transition-all duration-300 ease-out transform ${
+                className={`dashboard-slide min-h-[85dvh] flex flex-col justify-center pt-8 border-t border-[var(--ink)]/10 transition-all duration-300 ease-out transform ${
                   visibleSlides.has(3) ? 'opacity-100 translate-y-0 scale-100' : 'opacity-20 translate-y-12 scale-[0.98]'
                 }`}
               >
@@ -362,7 +362,7 @@ export function DashboardPage({ onBackToHome }) {
 
                 {/* Editorial Pull-Quote Narrative */}
                 <h2
-                  className="font-serif font-normal text-3xl sm:text-4xl md:text-5xl text-[#161513] leading-tight mb-12 max-w-5xl"
+                  className="font-serif font-normal text-3xl sm:text-4xl md:text-5xl text-[var(--ink)] leading-tight mb-12 max-w-5xl"
                   dangerouslySetInnerHTML={{ __html: story.trend.narrative }}
                 />
 
@@ -375,7 +375,7 @@ export function DashboardPage({ onBackToHome }) {
             {story.breakdown && (
               <section
                 data-slide-index="4"
-                className={`dashboard-slide min-h-[85dvh] flex flex-col justify-center pt-8 border-t border-[#161513]/10 transition-all duration-300 ease-out transform ${
+                className={`dashboard-slide min-h-[85dvh] flex flex-col justify-center pt-8 border-t border-[var(--ink)]/10 transition-all duration-300 ease-out transform ${
                   visibleSlides.has(4) ? 'opacity-100 translate-y-0 scale-100' : 'opacity-20 translate-y-12 scale-[0.98]'
                 }`}
               >
@@ -385,7 +385,7 @@ export function DashboardPage({ onBackToHome }) {
 
                 {/* Editorial Pull-Quote Narrative */}
                 <h2
-                  className="font-serif font-normal text-3xl sm:text-4xl md:text-5xl text-[#161513] leading-tight mb-12 max-w-5xl"
+                  className="font-serif font-normal text-3xl sm:text-4xl md:text-5xl text-[var(--ink)] leading-tight mb-12 max-w-5xl"
                   dangerouslySetInnerHTML={{ __html: story.breakdown.narrative }}
                 />
 
@@ -398,7 +398,7 @@ export function DashboardPage({ onBackToHome }) {
             {story.comparison && (
               <section
                 data-slide-index="5"
-                className={`dashboard-slide min-h-[85dvh] flex flex-col justify-center pt-8 border-t border-[#161513]/10 transition-all duration-300 ease-out transform ${
+                className={`dashboard-slide min-h-[85dvh] flex flex-col justify-center pt-8 border-t border-[var(--ink)]/10 transition-all duration-300 ease-out transform ${
                   visibleSlides.has(5) ? 'opacity-100 translate-y-0 scale-100' : 'opacity-20 translate-y-12 scale-[0.98]'
                 }`}
               >
@@ -408,7 +408,7 @@ export function DashboardPage({ onBackToHome }) {
 
                 {/* Editorial Pull-Quote Narrative */}
                 <h2
-                  className="font-serif font-normal text-3xl sm:text-4xl md:text-5xl text-[#161513] leading-tight mb-12 max-w-5xl"
+                  className="font-serif font-normal text-3xl sm:text-4xl md:text-5xl text-[var(--ink)] leading-tight mb-12 max-w-5xl"
                   dangerouslySetInnerHTML={{ __html: story.comparison.narrative }}
                 />
 
@@ -421,7 +421,7 @@ export function DashboardPage({ onBackToHome }) {
             {story.standouts && (
               <section
                 data-slide-index="6"
-                className={`dashboard-slide min-h-[85dvh] flex flex-col justify-center pt-8 border-t border-[#161513]/10 transition-all duration-300 ease-out transform ${
+                className={`dashboard-slide min-h-[85dvh] flex flex-col justify-center pt-8 border-t border-[var(--ink)]/10 transition-all duration-300 ease-out transform ${
                   visibleSlides.has(6) ? 'opacity-100 translate-y-0 scale-100' : 'opacity-20 translate-y-12 scale-[0.98]'
                 }`}
               >
@@ -431,7 +431,7 @@ export function DashboardPage({ onBackToHome }) {
 
                 {/* Editorial Pull-Quote Narrative */}
                 <h2
-                  className="font-serif font-normal text-3xl sm:text-4xl md:text-5xl text-[#161513] leading-tight mb-12 max-w-5xl"
+                  className="font-serif font-normal text-3xl sm:text-4xl md:text-5xl text-[var(--ink)] leading-tight mb-12 max-w-5xl"
                   dangerouslySetInnerHTML={{ __html: story.standouts.narrative }}
                 />
 
@@ -447,7 +447,7 @@ export function DashboardPage({ onBackToHome }) {
         <section
           id="act-7-explore"
           data-slide-index="7"
-          className={`print:hidden dashboard-slide pt-16 border-t-2 border-[#161513]/15 transition-all duration-300 ease-out transform ${
+          className={`print:hidden dashboard-slide pt-16 border-t-2 border-[var(--ink)]/15 transition-all duration-300 ease-out transform ${
             visibleSlides.has(7) ? 'opacity-100 translate-y-0' : 'opacity-20 translate-y-12'
           }`}
         >
@@ -456,10 +456,10 @@ export function DashboardPage({ onBackToHome }) {
               <div className="font-mono text-xs font-semibold uppercase tracking-widest text-[#b5470b] mb-2">
                 07 · EXPLORE IT YOURSELF
               </div>
-              <h2 className="font-serif font-normal text-4xl sm:text-5xl md:text-6xl text-[#161513] tracking-tight">
+              <h2 className="font-serif font-normal text-4xl sm:text-5xl md:text-6xl text-[var(--ink)] tracking-tight">
                 Now dig in
               </h2>
-              <p className="font-mono text-xs text-[#6f6a62] uppercase tracking-wider mt-2">
+              <p className="font-mono text-xs text-[var(--muted)] uppercase tracking-wider mt-2">
                 Apply filters to slice the data. Export what you find.
               </p>
             </div>
@@ -497,12 +497,12 @@ export function DashboardPage({ onBackToHome }) {
                 isSidebarOpen ? 'lg:w-64' : 'lg:w-12'
               }`}
             >
-              <div className="bg-white border border-[#161513]/10 rounded-[20px] p-5 shadow-sm sticky top-24 transition-colors">
+              <div className="bg-white border border-[var(--ink)]/10 rounded-[20px] p-5 shadow-sm sticky top-24 transition-colors">
                 
                 {/* Sidebar Header & Toggle Button */}
-                <div className="flex items-center justify-between pb-3.5 border-b border-[#161513]/8">
+                <div className="flex items-center justify-between pb-3.5 border-b border-[var(--ink)]/8">
                   {isSidebarOpen ? (
-                    <div className="flex items-center gap-2 font-mono text-xs uppercase tracking-wider font-semibold text-[#161513]">
+                    <div className="flex items-center gap-2 font-mono text-xs uppercase tracking-wider font-semibold text-[var(--ink)]">
                       <Sliders className="w-4 h-4 text-[#b5470b]" />
                       <span>Attribute Filters</span>
                     </div>
@@ -518,7 +518,7 @@ export function DashboardPage({ onBackToHome }) {
                   <button
                     onClick={() => setIsSidebarOpen(!isSidebarOpen)}
                     title={isSidebarOpen ? 'Collapse Sidebar' : 'Expand Sidebar'}
-                    className="hidden lg:block p-1 rounded-[6px] hover:bg-[#faf9f7] text-[#6f6a62] cursor-pointer"
+                    className="hidden lg:block p-1 rounded-[6px] hover:bg-[var(--bg)] text-[var(--muted)] cursor-pointer"
                   >
                     {isSidebarOpen ? <ChevronLeft className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
                   </button>
@@ -530,14 +530,14 @@ export function DashboardPage({ onBackToHome }) {
                     
                     {/* Attribute Visibility Selector Checklist */}
                     <div>
-                      <div className="flex items-center justify-between mb-2 text-[11px] font-mono uppercase text-[#6f6a62]">
+                      <div className="flex items-center justify-between mb-2 text-[11px] font-mono uppercase text-[var(--muted)]">
                         <span>Toggle Attributes ({visibleColumns.length}/{allColumns.length})</span>
                         <div className="flex items-center gap-3">
                           {Object.keys(typeOverrides).length > 0 && (
                             <button
                               onClick={resetTypeOverrides}
                               title="Revert all manual type reassignments back to auto-detected"
-                              className="text-[#9b958c] hover:underline cursor-pointer font-semibold normal-case"
+                              className="text-[var(--muted-2)] hover:underline cursor-pointer font-semibold normal-case"
                             >
                               Reset types
                             </button>
@@ -554,7 +554,7 @@ export function DashboardPage({ onBackToHome }) {
                           </button>
                         </div>
                       </div>
-                      <p className="text-[10px] text-[#9b958c] normal-case mb-2 -mt-1">
+                      <p className="text-[10px] text-[var(--muted-2)] normal-case mb-2 -mt-1">
                         Click the type icon to reassign a column if auto-detection got it wrong.
                       </p>
 
@@ -584,15 +584,15 @@ export function DashboardPage({ onBackToHome }) {
                               onClick={() => toggleColumnVisibility(col)}
                               className={`flex items-center justify-between px-2.5 py-1.5 rounded-[8px] border transition-colors cursor-pointer ${
                                 isVisible
-                                  ? 'bg-[#faf9f7] border-[#161513]/10 text-[#161513]'
-                                  : 'opacity-40 border-transparent text-[#9b958c]'
+                                  ? 'bg-[var(--bg)] border-[var(--ink)]/10 text-[var(--ink)]'
+                                  : 'opacity-40 border-transparent text-[var(--muted-2)]'
                               }`}
                             >
                               <div className="flex items-center gap-2 truncate">
                                 {isVisible ? (
                                   <CheckSquare className="w-3.5 h-3.5 text-[#b5470b] shrink-0" />
                                 ) : (
-                                  <Square className="w-3.5 h-3.5 text-[#9b958c] shrink-0" />
+                                  <Square className="w-3.5 h-3.5 text-[var(--muted-2)] shrink-0" />
                                 )}
                                 <span className="truncate font-mono text-[11px] font-medium">{formatColName(col)}</span>
                               </div>
@@ -615,32 +615,32 @@ export function DashboardPage({ onBackToHome }) {
                     </div>
 
                     {/* Summary Metric Stats Box */}
-                    <div className="p-3.5 bg-[#faf9f7] border border-[#161513]/10 rounded-[12px] space-y-2">
+                    <div className="p-3.5 bg-[var(--bg)] border border-[var(--ink)]/10 rounded-[12px] space-y-2">
                       <div className="flex items-center gap-1.5 font-mono text-[10px] uppercase font-bold text-[#b5470b]">
                         <Sparkles className="w-3.5 h-3.5" />
                         <span>Data Engine Status</span>
                       </div>
 
-                      <div className="space-y-1 font-mono text-[11px] text-[#6f6a62]">
+                      <div className="space-y-1 font-mono text-[11px] text-[var(--muted)]">
                         <div className="flex justify-between">
                           <span>Categoricals:</span>
-                          <span className="font-bold text-[#161513]">
+                          <span className="font-bold text-[var(--ink)]">
                             {config?.meta?.categoricalCols?.length || 0}
                           </span>
                         </div>
                         <div className="flex justify-between">
                           <span>Metrics:</span>
-                          <span className="font-bold text-[#161513]">
+                          <span className="font-bold text-[var(--ink)]">
                             {config?.meta?.numericCols?.length || 0}
                           </span>
                         </div>
                         <div className="flex justify-between">
                           <span>Time Axis:</span>
-                          <span className="font-bold text-[#161513]">
+                          <span className="font-bold text-[var(--ink)]">
                             {config?.meta?.dateCol ? formatColName(config.meta.dateCol) : 'None'}
                           </span>
                         </div>
-                        <div className="flex justify-between pt-1 border-t border-[#161513]/8">
+                        <div className="flex justify-between pt-1 border-t border-[var(--ink)]/8">
                           <span>Filtered Rows:</span>
                           <span className="font-bold text-[#b5470b]">
                             {filteredRows.length.toLocaleString()} / {constellationRows.length.toLocaleString()}

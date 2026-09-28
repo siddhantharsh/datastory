@@ -380,7 +380,7 @@ export function ParticleSwarm({ rows, meta, actIndex }) {
   return (
     <section
       data-slide-index={actIndex}
-      className="dashboard-slide min-h-[90dvh] flex flex-col justify-center pt-8 border-t border-[#161513]/10 transition-all duration-300 ease-out transform"
+      className="dashboard-slide min-h-[90dvh] flex flex-col justify-center pt-8 border-t border-[var(--ink)]/10 transition-all duration-300 ease-out transform"
       ref={containerRef}
     >
       {/* SECTION LABEL & HEADING */}
@@ -390,26 +390,26 @@ export function ParticleSwarm({ rows, meta, actIndex }) {
 
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-4">
         <div>
-          <h2 className="font-serif font-normal text-3xl sm:text-4xl md:text-5xl text-[#161513] leading-tight mb-2 max-w-5xl">
+          <h2 className="font-serif font-normal text-3xl sm:text-4xl md:text-5xl text-[var(--ink)] leading-tight mb-2 max-w-5xl">
             See every record at once.
           </h2>
-          <p className="font-mono text-[13px] text-[#6f6a62] max-w-3xl">
+          <p className="font-mono text-[13px] text-[var(--muted)] max-w-3xl">
             {narrativeText || `Each dot is one record. Switch views to transform spatial arrangements.`}
           </p>
-          <p className="font-mono text-[11px] text-[#9b958c] flex items-center gap-1.5 mt-1.5">
+          <p className="font-mono text-[11px] text-[var(--muted-2)] flex items-center gap-1.5 mt-1.5">
             <Info className="w-3 h-3 shrink-0" />
             <span>Click or tap any point to filter the story below.</span>
           </p>
         </div>
 
         {/* TOOLBAR TOGGLE GROUP */}
-        <div className="print:hidden bg-[#161513]/5 p-1 rounded-full border border-[#161513]/10 flex items-center gap-1 self-start md:self-auto shrink-0 shadow-inner">
+        <div className="print:hidden bg-[var(--ink)]/5 p-1 rounded-full border border-[var(--ink)]/10 flex items-center gap-1 self-start md:self-auto shrink-0 shadow-inner">
           <button
             onClick={() => setActiveFormation('cluster')}
             className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-mono font-medium transition-all ${
               activeFormation === 'cluster'
                 ? 'bg-[#161513] text-white shadow-sm'
-                : 'text-[#6f6a62] hover:text-[#161513] hover:bg-white/60'
+                : 'text-[var(--muted)] hover:text-[var(--ink)] hover:bg-white/60'
             }`}
           >
             <Share2 className="w-3.5 h-3.5" />
@@ -424,8 +424,8 @@ export function ParticleSwarm({ rows, meta, actIndex }) {
               activeFormation === 'timeline'
                 ? 'bg-[#161513] text-white shadow-sm'
                 : !dateCol
-                ? 'opacity-40 cursor-not-allowed text-[#9b958c]'
-                : 'text-[#6f6a62] hover:text-[#161513] hover:bg-white/60'
+                ? 'opacity-40 cursor-not-allowed text-[var(--muted-2)]'
+                : 'text-[var(--muted)] hover:text-[var(--ink)] hover:bg-white/60'
             }`}
           >
             <Calendar className="w-3.5 h-3.5" />
@@ -437,7 +437,7 @@ export function ParticleSwarm({ rows, meta, actIndex }) {
             className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-mono font-medium transition-all ${
               activeFormation === 'rank'
                 ? 'bg-[#161513] text-white shadow-sm'
-                : 'text-[#6f6a62] hover:text-[#161513] hover:bg-white/60'
+                : 'text-[var(--muted)] hover:text-[var(--ink)] hover:bg-white/60'
             }`}
           >
             <BarChart2 className="w-3.5 h-3.5" />
@@ -449,7 +449,7 @@ export function ParticleSwarm({ rows, meta, actIndex }) {
             className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-mono font-medium transition-all ${
               activeFormation === 'grid'
                 ? 'bg-[#161513] text-white shadow-sm'
-                : 'text-[#6f6a62] hover:text-[#161513] hover:bg-white/60'
+                : 'text-[var(--muted)] hover:text-[var(--ink)] hover:bg-white/60'
             }`}
           >
             <LayoutGrid className="w-3.5 h-3.5" />
@@ -459,7 +459,7 @@ export function ParticleSwarm({ rows, meta, actIndex }) {
       </div>
 
       {/* MAIN CANVAS CONTAINER */}
-      <div className="relative w-full h-[620px] bg-[#faf9f7] border border-[#161513]/10 rounded-[24px] shadow-sm overflow-hidden flex flex-col">
+      <div className="relative w-full h-[620px] bg-[var(--bg)] border border-[var(--ink)]/10 rounded-[24px] shadow-sm overflow-hidden flex flex-col">
         <canvas
           ref={canvasRef}
           onMouseMove={handleMouseMove}
@@ -518,10 +518,10 @@ export function ParticleSwarm({ rows, meta, actIndex }) {
         )}
 
         {/* BOTTOM LEGEND & RESET BAR */}
-        <div className="print:hidden absolute bottom-0 left-0 right-0 h-12 bg-white/90 backdrop-blur-md border-t border-[#161513]/10 flex items-center justify-between px-6 z-10">
-          <div className="flex items-center gap-5 overflow-x-auto py-1 scrollbar-none font-mono text-[11px] uppercase text-[#6f6a62]">
-            <span className="text-[#161513] font-semibold">{displayRows.length} Particles</span>
-            <span className="text-[#161513]/20">|</span>
+        <div className="print:hidden absolute bottom-0 left-0 right-0 h-12 bg-white/90 backdrop-blur-md border-t border-[var(--ink)]/10 flex items-center justify-between px-6 z-10">
+          <div className="flex items-center gap-5 overflow-x-auto py-1 scrollbar-none font-mono text-[11px] uppercase text-[var(--muted)]">
+            <span className="text-[var(--ink)] font-semibold">{displayRows.length} Particles</span>
+            <span className="text-[var(--ink)]/20">|</span>
             <div className="flex items-center gap-3">
               {categories.slice(0, 6).map((cat) => (
                 <div
@@ -530,7 +530,7 @@ export function ParticleSwarm({ rows, meta, actIndex }) {
                   className={`flex items-center gap-1.5 cursor-pointer px-2 py-0.5 rounded transition-all ${
                     String(constellationFilter) === String(cat)
                       ? 'bg-[#161513] text-white font-bold'
-                      : 'hover:bg-[#161513]/5'
+                      : 'hover:bg-[var(--ink)]/5'
                   }`}
                 >
                   <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: colorMap[cat] }} />
@@ -538,7 +538,7 @@ export function ParticleSwarm({ rows, meta, actIndex }) {
                 </div>
               ))}
               {categories.length > 6 && (
-                <span className="text-[#9b958c] text-[10px]">+{categories.length - 6} more</span>
+                <span className="text-[var(--muted-2)] text-[10px]">+{categories.length - 6} more</span>
               )}
             </div>
           </div>
@@ -548,7 +548,7 @@ export function ParticleSwarm({ rows, meta, actIndex }) {
             className={`flex items-center gap-1.5 font-mono text-[11px] font-semibold uppercase tracking-wider px-3 py-1.5 rounded-full transition-all shrink-0 ${
               constellationFilter
                 ? 'bg-[#161513] text-white hover:bg-[#b5470b] shadow-sm'
-                : 'text-[#9b958c] hover:bg-[#161513]/5'
+                : 'text-[var(--muted-2)] hover:bg-[var(--ink)]/5'
             }`}
           >
             <RotateCcw className="w-3 h-3" />

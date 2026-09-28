@@ -95,14 +95,14 @@ export function KPICards({ kpiConfigs = [], rows = [], meta = {} }) {
         return (
           <div
             key={config.id || idx}
-            className="p-8 bg-white border border-[#161513]/10 rounded-[20px] shadow-sm flex flex-col justify-between transition-all hover:border-[#b5470b]/40"
+            className="p-8 bg-white border border-[var(--ink)]/10 rounded-[20px] shadow-sm flex flex-col justify-between transition-all hover:border-[#b5470b]/40"
           >
             <div>
-              <div className="font-mono text-xs uppercase tracking-wider text-[#6f6a62] font-medium mb-3 truncate">
+              <div className="font-mono text-xs uppercase tracking-wider text-[var(--muted)] font-medium mb-3 truncate">
                 {config.title}
               </div>
 
-              <div className="font-serif font-normal text-4xl sm:text-5xl text-[#161513] tracking-tight mb-4">
+              <div className="font-serif font-normal text-4xl sm:text-5xl text-[var(--ink)] tracking-tight mb-4">
                 {val === null ? '—' : formatNumberValue(val)}
               </div>
             </div>
@@ -121,7 +121,7 @@ export function KPICards({ kpiConfigs = [], rows = [], meta = {} }) {
                 </svg>
               </div>
             ) : (
-              <div className="text-[11px] font-mono text-[#6f6a62] pt-1">
+              <div className="text-[11px] font-mono text-[var(--muted)] pt-1">
                 Total aggregate count
               </div>
             )}

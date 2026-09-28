@@ -44,7 +44,7 @@ export function ActStandoutsTables({ standoutsInfo }) {
                   <span className="font-bold text-emerald-700 w-5">
                     {String(idx + 1).padStart(2, '0')}
                   </span>
-                  <span className="font-sans font-medium text-[#161513] truncate">
+                  <span className="font-sans font-medium text-[var(--ink)] truncate">
                     {[cat, date].filter(Boolean).join(' · ') || `Record #${idx + 1}`}
                   </span>
                 </div>
@@ -83,7 +83,7 @@ export function ActStandoutsTables({ standoutsInfo }) {
                   <span className="font-bold text-rose-700 w-5">
                     {String(idx + 1).padStart(2, '0')}
                   </span>
-                  <span className="font-sans font-medium text-[#161513] truncate">
+                  <span className="font-sans font-medium text-[var(--ink)] truncate">
                     {[cat, date].filter(Boolean).join(' · ') || `Record #${idx + 1}`}
                   </span>
                 </div>
@@ -117,11 +117,11 @@ export function ActStandoutsTables({ standoutsInfo }) {
               key={idx}
               className="flex items-center justify-between p-3 rounded-[10px] bg-white/90 border border-amber-200/50 text-xs font-mono"
             >
-              <span className="truncate text-[#161513] font-medium">
+              <span className="truncate text-[var(--ink)] font-medium">
                 {[a.category, a.date].filter(Boolean).join(' · ') || `Record #${idx + 1}`}
               </span>
               <span className="flex items-center gap-1.5 shrink-0 ml-2">
-                <span className="font-bold text-[#161513]">{a.value}</span>
+                <span className="font-bold text-[var(--ink)]">{a.value}</span>
                 <span className={`text-[10px] ${a.zScore > 0 ? 'text-emerald-700' : 'text-red-700'}`}>
                   ({a.zScore > 0 ? '+' : ''}{a.zScore}σ)
                 </span>

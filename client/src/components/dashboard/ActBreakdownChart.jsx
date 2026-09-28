@@ -8,13 +8,13 @@ export function ActBreakdownChart({ breakdownInfo }) {
   const maxVal = sortedCats[0]?.value || 1;
 
   return (
-    <div className="p-8 sm:p-10 bg-white border border-[#161513]/10 rounded-[24px] shadow-sm font-sans">
-      <div className="flex flex-wrap items-baseline justify-between gap-4 mb-6 pb-4 border-b border-[#161513]/8">
+    <div className="p-8 sm:p-10 bg-white border border-[var(--ink)]/10 rounded-[24px] shadow-sm font-sans">
+      <div className="flex flex-wrap items-baseline justify-between gap-4 mb-6 pb-4 border-b border-[var(--ink)]/8">
         <div>
-          <h4 className="font-serif text-2xl sm:text-3xl text-[#161513] font-normal">
+          <h4 className="font-serif text-2xl sm:text-3xl text-[var(--ink)] font-normal">
             {formatColName(categoryCol)} Distribution
           </h4>
-          <p className="font-mono text-xs text-[#6f6a62] uppercase tracking-wider mt-1">
+          <p className="font-mono text-xs text-[var(--muted)] uppercase tracking-wider mt-1">
             Ranked by total {formatColName(numCol)}
           </p>
         </div>
@@ -30,21 +30,21 @@ export function ActBreakdownChart({ breakdownInfo }) {
             <div key={cat.name} className="group">
               <div className="flex items-center justify-between text-xs font-mono mb-1.5">
                 <div className="flex items-center gap-3">
-                  <span className={`font-semibold ${isTop ? 'text-[#b5470b]' : 'text-[#6f6a62]'}`}>
+                  <span className={`font-semibold ${isTop ? 'text-[#b5470b]' : 'text-[var(--muted)]'}`}>
                     {String(idx + 1).padStart(2, '0')}
                   </span>
-                  <span className="font-sans font-medium text-[#161513] group-hover:text-[#b5470b] transition-colors">
+                  <span className="font-sans font-medium text-[var(--ink)] group-hover:text-[#b5470b] transition-colors">
                     {cat.name}
                   </span>
                 </div>
-                <span className="font-semibold text-[#161513]">{formatNumberValue(cat.value)}</span>
+                <span className="font-semibold text-[var(--ink)]">{formatNumberValue(cat.value)}</span>
               </div>
 
               {/* Progress Bar Container */}
-              <div className="h-3.5 w-full bg-[#faf9f7] rounded-full overflow-hidden border border-[#161513]/8">
+              <div className="h-3.5 w-full bg-[var(--bg)] rounded-full overflow-hidden border border-[var(--ink)]/8">
                 <div
                   className={`h-full rounded-full transition-all duration-1000 ease-out ${
-                    isTop ? 'bg-[#b5470b]' : 'bg-[#161513]/20 group-hover:bg-[#b5470b]/60'
+                    isTop ? 'bg-[#b5470b]' : 'bg-[var(--ink)]/20 group-hover:bg-[#b5470b]/60'
                   }`}
                   style={{
                     width: `${pct}%`,

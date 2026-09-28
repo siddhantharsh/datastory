@@ -20,13 +20,13 @@ export function ActComparisonChart({ data = [], comparisonInfo }) {
   }, [data, col1, col2, xCol]);
 
   return (
-    <div className="p-8 sm:p-10 bg-white border border-[#161513]/10 rounded-[24px] shadow-sm font-sans">
-      <div className="flex flex-wrap items-baseline justify-between gap-4 mb-6 pb-4 border-b border-[#161513]/8">
+    <div className="p-8 sm:p-10 bg-white border border-[var(--ink)]/10 rounded-[24px] shadow-sm font-sans">
+      <div className="flex flex-wrap items-baseline justify-between gap-4 mb-6 pb-4 border-b border-[var(--ink)]/8">
         <div>
-          <h4 className="font-serif text-2xl sm:text-3xl text-[#161513] font-normal">
+          <h4 className="font-serif text-2xl sm:text-3xl text-[var(--ink)] font-normal">
             {formatColName(col1)} vs {formatColName(col2)}
           </h4>
-          <p className="font-mono text-xs text-[#6f6a62] uppercase tracking-wider mt-1">
+          <p className="font-mono text-xs text-[var(--muted)] uppercase tracking-wider mt-1">
             Dual Metric Co-movement Analysis
           </p>
         </div>
@@ -70,15 +70,15 @@ export function ActComparisonChart({ data = [], comparisonInfo }) {
               content={({ active, payload, label }) => {
                 if (!active || !payload || !payload.length) return null;
                 return (
-                  <div className="bg-white border border-[#161513]/15 p-3.5 rounded-[12px] shadow-lg text-xs font-sans space-y-1">
-                    <p className="font-mono font-semibold text-[#161513] mb-1.5">{label}</p>
+                  <div className="bg-white border border-[var(--ink)]/15 p-3.5 rounded-[12px] shadow-lg text-xs font-sans space-y-1">
+                    <p className="font-mono font-semibold text-[var(--ink)] mb-1.5">{label}</p>
                     {payload.map((entry, idx) => (
                       <div key={idx} className="flex items-center justify-between gap-4 font-mono">
-                        <span className="flex items-center gap-1.5 text-[#6f6a62]">
+                        <span className="flex items-center gap-1.5 text-[var(--muted)]">
                           <span className="w-2 h-2 rounded-full" style={{ backgroundColor: entry.color }} />
                           {formatColName(entry.name)}:
                         </span>
-                        <span className="font-bold text-[#161513]">{entry.value.toLocaleString()}</span>
+                        <span className="font-bold text-[var(--ink)]">{entry.value.toLocaleString()}</span>
                       </div>
                     ))}
                   </div>
