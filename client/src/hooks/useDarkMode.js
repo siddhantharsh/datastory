@@ -10,11 +10,10 @@ const STORAGE_KEY = 'datastory_dark_mode';
 // gates whether the class actually lands on <html> without losing the
 // user's underlying preference (still tracked/persisted regardless).
 export function useDarkMode(active = true) {
-  const [isDark, setIsDark] = useState(() => {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    if (stored !== null) return stored === 'true';
-    return window.matchMedia?.('(prefers-color-scheme: dark)').matches ?? false;
-  });
+  // Light is always the default on first visit — deliberately NOT following
+  // the OS's prefers-color-scheme, since that surprised users with an
+  // unrequested dark mode. Only an explicit toggle (persisted below) changes it.
+  const [isDark, setIsDark] = useState(() => localStorage.getItem(STORAGE_KEY) === 'true');
 
   useEffect(() => {
     document.documentElement.classList.toggle('dark', isDark && active);
