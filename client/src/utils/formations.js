@@ -115,10 +115,15 @@ export function layoutTimeline(particles, dateCol, numericCol, categoricalCol, w
   const plotW = width - padding.left - padding.right;
   const plotH = height - padding.top - padding.bottom;
 
-  const validParticles = particles.filter(p => p.date && !isNaN(new Date(p.date).getTime()));
+  // Uses each particle's pre-parsed dateMs (resolved via parseDateValue with
+  // the column's detected date format in ParticleSwarm.jsx) rather than
+  // re-parsing p.date with a raw new Date() here, which would silently
+  // misplace or drop particles for non-ISO/US date formats (e.g. DD/MM/YYYY
+  // with day > 12 is Invalid Date under a bare new Date() call).
+  const validParticles = particles.filter(p => p.dateMs !== null && p.dateMs !== undefined && !isNaN(p.dateMs));
   if (!validParticles.length) return { axes: null, narrative: 'No valid dates detected in dataset.' };
 
-  const dates = validParticles.map(p => new Date(p.date).getTime());
+  const dates = validParticles.map(p => p.dateMs);
   const values = particles.map(p => p.value);
 
   const minDate = Math.min(...dates);
@@ -130,7 +135,7 @@ export function layoutTimeline(particles, dateCol, numericCol, categoricalCol, w
   const valSpan = maxVal - minVal || 1;
 
   particles.forEach((p, idx) => {
-    let t = p.date ? new Date(p.date).getTime() : minDate;
+    let t = (p.dateMs !== null && p.dateMs !== undefined) ? p.dateMs : minDate;
     if (isNaN(t)) t = minDate;
 
     const xRatio = (t - minDate) / dateSpan;

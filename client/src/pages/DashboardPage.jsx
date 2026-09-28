@@ -583,6 +583,7 @@ export function DashboardPage({ onBackToHome }) {
               <DataTableExplorer
                 rows={filteredRows}
                 columns={displayColumns}
+                meta={config?.meta}
               />
 
               {/* STATISTICAL SUMMARY MATRIX */}

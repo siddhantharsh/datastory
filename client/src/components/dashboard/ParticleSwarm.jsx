@@ -1,7 +1,7 @@
 import React, { useRef, useEffect, useState, useMemo } from 'react';
 import { useDataset } from '../../context/DatasetContext';
 import { formatNumberValue, formatColName } from '../../utils/smartDetector';
-import { parseNumericValue } from '../../utils/csvHelpers';
+import { parseNumericValue, parseDateValue } from '../../utils/csvHelpers';
 import {
   getCategoryColorMap,
   layoutCluster,
@@ -63,6 +63,11 @@ export function ParticleSwarm({ rows, meta, actIndex }) {
       const parsedVal = numericCol ? parseNumericValue(r[numericCol]) : NaN;
       const val = !isNaN(parsedVal) ? parsedVal : 1;
       const d = dateCol ? r[dateCol] : null;
+      // Pre-parsed once here (using the column's resolved dateFormat) so the
+      // Timeline formation and the hover tooltip don't each re-parse the raw
+      // value with a bare new Date(), which silently mis-sorts or drops
+      // non-ISO/US dates (e.g. DD/MM/YYYY with day > 12).
+      const parsedDate = dateCol ? parseDateValue(d, meta?.dateFormat) : null;
 
       return {
         id: idx,
@@ -78,9 +83,10 @@ export function ParticleSwarm({ rows, meta, actIndex }) {
         category: cat,
         value: val,
         date: d,
+        dateMs: parsedDate ? parsedDate.getTime() : NaN,
       };
     });
-  }, [displayRows, categoricalCol, numericCol, dateCol, colorMap]);
+  }, [displayRows, categoricalCol, numericCol, dateCol, colorMap, meta?.dateFormat]);
 
   // Main Canvas & Layout Engine
   useEffect(() => {
@@ -491,7 +497,7 @@ export function ParticleSwarm({ rows, meta, actIndex }) {
                   <div className="flex justify-between gap-3 text-white/80">
                     <span className="text-white/50">{formatColName(dateCol)}</span>
                     <span className="font-semibold text-white">
-                      {hoveredParticle.date ? new Date(hoveredParticle.date).toLocaleDateString() : 'N/A'}
+                      {!isNaN(hoveredParticle.dateMs) ? new Date(hoveredParticle.dateMs).toLocaleDateString() : 'N/A'}
                     </span>
                   </div>
                 )}

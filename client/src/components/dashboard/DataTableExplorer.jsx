@@ -1,8 +1,9 @@
 import React, { useState, useMemo } from 'react';
 import { Search, ArrowUpDown, ArrowUp, ArrowDown, ChevronLeft, ChevronRight } from 'lucide-react';
 import { formatColName } from '../../utils/smartDetector';
+import { parseNumericValue, parseDateValue } from '../../utils/csvHelpers';
 
-export function DataTableExplorer({ rows = [], columns = [] }) {
+export function DataTableExplorer({ rows = [], columns = [], meta = {} }) {
   const [searchTerm, setSearchTerm] = useState('');
   const [sortCol, setSortCol] = useState(null);
   const [sortDir, setSortDir] = useState('asc');
@@ -21,16 +22,34 @@ export function DataTableExplorer({ rows = [], columns = [] }) {
     );
   }, [rows, searchTerm]);
 
-  // Sort rows
+  // Sort rows. Column-type aware: a currency-formatted numeric column
+  // ("$1,234.56") or a non-ISO date column would otherwise fall through to
+  // plain string comparison below (typeof !== 'number'), sorting "$1,234"
+  // before "$99" and DD/MM/YYYY dates in the wrong order.
   const sortedRows = useMemo(() => {
     if (!sortCol || !searchedRows.length) return searchedRows;
+
+    const isNumericCol = meta?.numericCols?.includes(sortCol);
+    const isDateCol = sortCol === meta?.dateCol;
 
     return [...searchedRows].sort((a, b) => {
       let valA = a[sortCol];
       let valB = b[sortCol];
 
-      if (valA === null || valA === undefined) return 1;
-      if (valB === null || valB === undefined) return -1;
+      if (valA === null || valA === undefined || valA === '') return 1;
+      if (valB === null || valB === undefined || valB === '') return -1;
+
+      if (isNumericCol) {
+        const numA = parseNumericValue(valA);
+        const numB = parseNumericValue(valB);
+        return sortDir === 'asc' ? numA - numB : numB - numA;
+      }
+
+      if (isDateCol) {
+        const dateA = parseDateValue(valA, meta?.dateFormat)?.getTime() ?? 0;
+        const dateB = parseDateValue(valB, meta?.dateFormat)?.getTime() ?? 0;
+        return sortDir === 'asc' ? dateA - dateB : dateB - dateA;
+      }
 
       if (typeof valA === 'number' && typeof valB === 'number') {
         return sortDir === 'asc' ? valA - valB : valB - valA;
@@ -43,7 +62,7 @@ export function DataTableExplorer({ rows = [], columns = [] }) {
       if (strA > strB) return sortDir === 'asc' ? 1 : -1;
       return 0;
     });
-  }, [searchedRows, sortCol, sortDir]);
+  }, [searchedRows, sortCol, sortDir, meta]);
 
   // Pagination
   const totalPages = Math.ceil(sortedRows.length / pageSize) || 1;
