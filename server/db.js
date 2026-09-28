@@ -65,7 +65,7 @@ function seedSampleDatasets() {
     const parsed = Papa.parse(content, { header: true, skipEmptyLines: true });
 
     if (parsed.data && parsed.data.length > 0) {
-      const columns = Object.keys(parsed.data[0]);
+      const columns = parsed.meta.fields || Object.keys(parsed.data[0]);
       const rowCount = parsed.data.length;
       const colCount = columns.length;
       const createdAt = new Date().toISOString();

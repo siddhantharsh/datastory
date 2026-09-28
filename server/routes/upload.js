@@ -33,7 +33,7 @@ const upload = multer({
   }
 });
 
-router.post('/', upload.single('file'), (req, res) => {
+function handleUpload(req, res) {
   try {
     if (!req.file) {
       return res.status(400).json({ error: 'No file uploaded' });
@@ -47,10 +47,38 @@ router.post('/', upload.single('file'), (req, res) => {
       return res.status(400).json({ error: 'CSV file is empty or invalid' });
     }
 
-    const columns = Object.keys(parsed.data[0]);
+    // Use the actual header row (parsed.meta.fields), not the first data
+    // row's keys — if the first row happens to have fewer fields than the
+    // header (a ragged CSV), Object.keys(parsed.data[0]) silently drops
+    // those columns from the entire dataset even though later rows have data
+    // for them.
+    const columns = parsed.meta.fields || Object.keys(parsed.data[0]);
+
+    // Rows with more fields than the header get the overflow stuffed into
+    // __parsed_extra by Papaparse — strip it so it doesn't leak in as a
+    // bogus extra "column".
+    const rows = parsed.data.map((row) => {
+      if (row.__parsed_extra !== undefined) {
+        const { __parsed_extra, ...rest } = row;
+        return rest;
+      }
+      return row;
+    });
+
+    const warnings = [];
+    if (parsed.errors && parsed.errors.length > 0) {
+      const byType = {};
+      parsed.errors.forEach((e) => {
+        byType[e.type || e.code] = (byType[e.type || e.code] || 0) + 1;
+      });
+      Object.entries(byType).forEach(([type, count]) => {
+        warnings.push(`${count} row${count === 1 ? '' : 's'} had a "${type}" formatting issue and may be misaligned.`);
+      });
+    }
+
     const name = req.body.name || path.parse(req.file.originalname).name;
     const id = `dataset-${Date.now()}`;
-    const rowCount = parsed.data.length;
+    const rowCount = rows.length;
     const colCount = columns.length;
     const createdAt = new Date().toISOString();
 
@@ -66,15 +94,20 @@ router.post('/', upload.single('file'), (req, res) => {
 
     const saveTransaction = db.transaction(() => {
       insertDataset.run(id, name, req.file.filename, rowCount, colCount, JSON.stringify(columns), createdAt);
-      parsed.data.forEach((row, idx) => {
+      rows.forEach((row, idx) => {
         insertRow.run(id, idx, JSON.stringify(row));
       });
     });
 
     saveTransaction();
 
+    // The row data now lives in SQLite; the raw upload on disk is redundant
+    // and would otherwise grow server/uploads/ unbounded on every upload.
+    fs.unlink(filePath, () => {});
+
     res.status(201).json({
       message: 'Dataset uploaded successfully',
+      warnings,
       dataset: {
         id,
         name,
@@ -83,13 +116,25 @@ router.post('/', upload.single('file'), (req, res) => {
         colCount,
         columns,
         createdAt,
-        rows: parsed.data
+        rows
       }
     });
   } catch (error) {
     console.error('Upload Error:', error);
     res.status(500).json({ error: error.message || 'Failed to process CSV file' });
   }
+}
+
+router.post('/', (req, res) => {
+  upload.single('file')(req, res, (err) => {
+    if (err) {
+      if (err instanceof multer.MulterError && err.code === 'LIMIT_FILE_SIZE') {
+        return res.status(413).json({ error: 'File exceeds the 10MB upload limit' });
+      }
+      return res.status(400).json({ error: err.message || 'Upload failed' });
+    }
+    handleUpload(req, res);
+  });
 });
 
 module.exports = router;
