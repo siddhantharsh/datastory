@@ -4,6 +4,8 @@ import { Button } from './Button';
 import { UploadCloud, FileText, CheckCircle2, AlertCircle } from 'lucide-react';
 import { useDataset } from '../../context/DatasetContext';
 
+const MAX_FILE_SIZE = 10 * 1024 * 1024; // must match server/routes/upload.js's multer limit
+
 export function UploadModal({ isOpen, onClose, onSuccess }) {
   const { uploadDataset } = useDataset();
   const [file, setFile] = useState(null);
@@ -11,33 +13,32 @@ export function UploadModal({ isOpen, onClose, onSuccess }) {
   const [isUploading, setIsUploading] = useState(false);
   const [error, setError] = useState(null);
   const [isDragOver, setIsDragOver] = useState(false);
+  const [warnings, setWarnings] = useState(null);
+
+  const acceptFile = (candidate) => {
+    if (!(candidate.type === 'text/csv' || candidate.name.endsWith('.csv'))) {
+      setError('Please select a valid CSV file.');
+      return;
+    }
+    if (candidate.size > MAX_FILE_SIZE) {
+      setError(`"${candidate.name}" is ${(candidate.size / (1024 * 1024)).toFixed(1)}MB, which exceeds the 10MB upload limit.`);
+      return;
+    }
+    setFile(candidate);
+    setDatasetName(candidate.name.replace(/\.csv$/i, ''));
+    setError(null);
+  };
 
   const handleFileChange = (e) => {
     const selected = e.target.files[0];
-    if (selected) {
-      if (selected.type === 'text/csv' || selected.name.endsWith('.csv')) {
-        setFile(selected);
-        setDatasetName(selected.name.replace(/\.csv$/i, ''));
-        setError(null);
-      } else {
-        setError('Please select a valid CSV file.');
-      }
-    }
+    if (selected) acceptFile(selected);
   };
 
   const handleDrop = (e) => {
     e.preventDefault();
     setIsDragOver(false);
     const dropped = e.dataTransfer.files[0];
-    if (dropped) {
-      if (dropped.type === 'text/csv' || dropped.name.endsWith('.csv')) {
-        setFile(dropped);
-        setDatasetName(dropped.name.replace(/\.csv$/i, ''));
-        setError(null);
-      } else {
-        setError('Please drop a valid CSV file.');
-      }
-    }
+    if (dropped) acceptFile(dropped);
   };
 
   const handleUpload = async (e) => {
@@ -47,17 +48,51 @@ export function UploadModal({ isOpen, onClose, onSuccess }) {
     try {
       setIsUploading(true);
       setError(null);
-      await uploadDataset(file, datasetName);
+      const uploaded = await uploadDataset(file, datasetName);
       setFile(null);
       setDatasetName('');
-      onClose();
-      if (onSuccess) onSuccess();
+      if (uploaded.warnings && uploaded.warnings.length > 0) {
+        // Keep the modal open one more beat so parse warnings aren't
+        // silently dropped — the dataset is already active underneath.
+        setWarnings(uploaded.warnings);
+      } else {
+        onClose();
+        if (onSuccess) onSuccess();
+      }
     } catch (err) {
       setError(err.message || 'Failed to upload file');
     } finally {
       setIsUploading(false);
     }
   };
+
+  const dismissWarnings = () => {
+    setWarnings(null);
+    onClose();
+    if (onSuccess) onSuccess();
+  };
+
+  if (warnings) {
+    return (
+      <Modal isOpen={isOpen} onClose={dismissWarnings} title="Dataset Imported — With Some Notes">
+        <div className="space-y-4">
+          <div className="p-3 bg-amber-500/10 border border-amber-500/20 rounded-[8px] flex items-start gap-2 text-sm text-amber-800">
+            <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
+            <ul className="space-y-1 list-disc list-inside">
+              {warnings.map((w, i) => (
+                <li key={i}>{w}</li>
+              ))}
+            </ul>
+          </div>
+          <div className="flex justify-end">
+            <Button type="button" variant="primary" onClick={dismissWarnings}>
+              Continue
+            </Button>
+          </div>
+        </div>
+      </Modal>
+    );
+  }
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="Upload Custom CSV Dataset">

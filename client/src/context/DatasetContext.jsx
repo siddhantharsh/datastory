@@ -90,7 +90,7 @@ export function DatasetProvider({ children }) {
 
       // Set as active dataset
       setActiveDataset(newDataset);
-      return newDataset;
+      return { ...newDataset, warnings: result.warnings || [] };
     } catch (err) {
       console.error('Upload Error:', err);
       setError(err.message);
