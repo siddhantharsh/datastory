@@ -19,7 +19,7 @@ import { parseNumericValue, parseDateValue } from '../utils/csvHelpers';
 import { Sliders, CheckSquare, Square, Sparkles, ChevronLeft, ChevronRight, Hash, Calendar, Tag, Type, ArrowDown } from 'lucide-react';
 
 export function DashboardPage({ onBackToHome }) {
-  const { activeDataset, loading, error, constellationFilter, setConstellationFilter } = useDataset();
+  const { activeDataset, loading, error, constellationFilter, setConstellationFilter, selectDataset } = useDataset();
 
   // Active Slide Tracker (1 to 7)
   const [activeSlide, setActiveSlide] = useState(1);
@@ -50,6 +50,53 @@ export function DashboardPage({ onBackToHome }) {
   };
   const resetTypeOverrides = () => setTypeOverrides({});
 
+  // Shareable/permalink view: a ?dataset=<id>&state=<json> URL restores the
+  // same dataset + filters + visible columns + type overrides. Read once on
+  // mount; the actual restore happens in the dataset-change effect below
+  // (once activeDataset has caught up to the URL's dataset id), so it isn't
+  // clobbered by that effect's own reset-to-defaults behavior.
+  const pendingUrlStateRef = useRef(null);
+  const urlHydratedRef = useRef(false);
+  const targetDatasetIdRef = useRef(null);
+
+  useEffect(() => {
+    if (urlHydratedRef.current) return;
+    urlHydratedRef.current = true;
+
+    const params = new URLSearchParams(window.location.search);
+    const stateParam = params.get('state');
+
+    if (stateParam) {
+      try {
+        pendingUrlStateRef.current = JSON.parse(stateParam);
+      } catch {
+        // Malformed/tampered state param — ignore, fall back to defaults.
+      }
+    }
+
+    targetDatasetIdRef.current = params.get('dataset');
+  }, []);
+
+  // DatasetContext auto-selects the first dataset on its own load, which
+  // races with the URL's requested dataset (both are async fetches with
+  // unpredictable ordering) — re-assert the target on every activeDataset
+  // change until it actually matches, rather than a one-shot mount call.
+  useEffect(() => {
+    const targetId = targetDatasetIdRef.current;
+    if (targetId && activeDataset?.id !== targetId) {
+      selectDataset(targetId);
+    }
+  }, [activeDataset?.id]);
+
+  // Keep the URL in sync with the current view so it can be shared/bookmarked.
+  useEffect(() => {
+    if (!activeDataset?.id) return;
+    const params = new URLSearchParams();
+    params.set('dataset', activeDataset.id);
+    params.set('state', JSON.stringify({ filters, visibleColumns, typeOverrides }));
+    window.history.replaceState(null, '', `${window.location.pathname}?${params.toString()}`);
+  }, [activeDataset?.id, filters, visibleColumns, typeOverrides]);
+
   // Scroll to top resting on Slide 1 on mount or dataset load
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'instant' });
@@ -78,17 +125,24 @@ export function DashboardPage({ onBackToHome }) {
     return generateStory(constellationRows, config.meta);
   }, [constellationRows, config, activeDataset]);
 
-  // Reset filters and column selector when dataset changes
+  // Reset filters and column selector when dataset changes — or, if a
+  // shareable-URL restore is pending for this exact dataset, apply that
+  // instead of the defaults.
   useEffect(() => {
     if (activeDataset && activeDataset.columns) {
       const cols = activeDataset.columns || Object.keys(activeDataset.rows[0] || {});
-      setVisibleColumns(cols);
-      setFilters({
-        categorical: {},
-        numeric: {},
-        dateRange: { start: '', end: '' }
-      });
-      setTypeOverrides({});
+      const pending = pendingUrlStateRef.current;
+      pendingUrlStateRef.current = null;
+
+      setVisibleColumns(pending?.visibleColumns?.length ? pending.visibleColumns : cols);
+      setFilters(
+        pending?.filters || {
+          categorical: {},
+          numeric: {},
+          dateRange: { start: '', end: '' }
+        }
+      );
+      setTypeOverrides(pending?.typeOverrides || {});
     }
   }, [activeDataset?.id]);
 

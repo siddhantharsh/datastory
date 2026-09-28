@@ -1,13 +1,27 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useDataset } from '../../context/DatasetContext';
 import { UploadModal } from '../ui/UploadModal';
-import { Database, Upload, Trash2, FileSpreadsheet, ArrowLeft, Download, ChevronDown, FileCode, Table } from 'lucide-react';
+import { Database, Upload, Trash2, FileSpreadsheet, ArrowLeft, Download, ChevronDown, FileCode, Table, Link2, Check } from 'lucide-react';
 
 export function DatasetHeader({ onBackToHome, filteredRows = [] }) {
   const { datasets, activeDataset, selectDataset, deleteDataset, loading, isEditor } = useDataset();
   const [isUploadOpen, setIsUploadOpen] = useState(false);
   const [isExportOpen, setIsExportOpen] = useState(false);
+  const [linkCopied, setLinkCopied] = useState(false);
   const exportRef = useRef(null);
+
+  // The URL is kept in sync with the active dataset + filters/columns/type
+  // overrides by DashboardPage as the user interacts, so copying it here
+  // always reflects the current view — a reopened link restores the same state.
+  const handleCopyLink = async () => {
+    try {
+      await navigator.clipboard.writeText(window.location.href);
+      setLinkCopied(true);
+      setTimeout(() => setLinkCopied(false), 2000);
+    } catch {
+      // Clipboard API unavailable/denied — no-op, the button just won't confirm.
+    }
+  };
 
   useEffect(() => {
     const handleClickOutside = (e) => {
@@ -142,6 +156,25 @@ export function DatasetHeader({ onBackToHome, filteredRows = [] }) {
               <span>Upload CSV</span>
             </button>
           )}
+
+          {/* Copy shareable link: current dataset + filters + visible columns + type overrides */}
+          <button
+            onClick={handleCopyLink}
+            title="Copy a link to this exact filtered view"
+            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-[12px] border border-[#161513]/15 bg-white text-xs font-sans font-medium text-[#161513] hover:bg-[#faf9f7] transition-all cursor-pointer"
+          >
+            {linkCopied ? (
+              <>
+                <Check className="w-4 h-4 text-emerald-600" />
+                <span>Copied!</span>
+              </>
+            ) : (
+              <>
+                <Link2 className="w-4 h-4 text-[#b5470b]" />
+                <span>Copy Link</span>
+              </>
+            )}
+          </button>
 
           {/* Export Dropdown Menu */}
           <div className="relative" ref={exportRef}>

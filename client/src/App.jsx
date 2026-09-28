@@ -6,7 +6,11 @@ import { LandingPage } from './pages/LandingPage';
 import { DashboardPage } from './pages/DashboardPage';
 
 export default function App() {
-  const [currentPage, setCurrentPage] = useState('landing'); // 'landing' | 'dashboard'
+  // A shareable dashboard link (?dataset=...&state=...) should land directly
+  // on the dashboard rather than the landing page.
+  const [currentPage, setCurrentPage] = useState(() =>
+    new URLSearchParams(window.location.search).has('dataset') ? 'dashboard' : 'landing'
+  ); // 'landing' | 'dashboard'
 
   return (
     <DatasetProvider>
