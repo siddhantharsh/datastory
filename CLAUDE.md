@@ -126,9 +126,22 @@ ssh lightsail 'docker ps; curl -s 127.0.0.1:3001/api/health; docker stats --no-s
 newly loaded `datastory:latest` image and recreates the container; the named volume keeps the
 database/uploads). No code changes are needed on the box itself.
 
-**cloudflared / domain**: managed separately by the project owner. It just needs to point its
-tunnel's ingress at `http://127.0.0.1:3001` on the same Lightsail instance — no app-side changes
-required for that.
+## Domain routing (Cloudflare Tunnel)
+
+The app is reachable at **https://datastory.manojsrivatsava.com**. `cloudflared` runs on the same
+Lightsail instance as a systemd service (`systemctl status cloudflared`) and tunnels that hostname
+to the container's port:
+
+```
+datastory.manojsrivatsava.com  --(cloudflared tunnel)-->  http://127.0.0.1:3001
+```
+
+This is the same loopback port the `docker-compose.yml` container binds — nothing else needs to
+change on the app side. `cloudflared`'s ingress rule lives in `/etc/cloudflared/config.yml` on the
+instance and maps that one hostname to that one port; it runs independently of the app container,
+so redeploying the app (`docker compose up -d`) never touches the tunnel, and restarting the
+tunnel (`sudo systemctl restart cloudflared`) never touches the app. If the app's port ever
+changes, update the `service:` line in that config and restart the `cloudflared` service.
 
 ## Known limitations (in scope for hackathon judging discussion)
 
