@@ -403,7 +403,7 @@ export function ParticleSwarm({ rows, meta, actIndex }) {
         </div>
 
         {/* TOOLBAR TOGGLE GROUP */}
-        <div className="bg-[#161513]/5 p-1 rounded-full border border-[#161513]/10 flex items-center gap-1 self-start md:self-auto shrink-0 shadow-inner">
+        <div className="print:hidden bg-[#161513]/5 p-1 rounded-full border border-[#161513]/10 flex items-center gap-1 self-start md:self-auto shrink-0 shadow-inner">
           <button
             onClick={() => setActiveFormation('cluster')}
             className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-mono font-medium transition-all ${
@@ -518,7 +518,7 @@ export function ParticleSwarm({ rows, meta, actIndex }) {
         )}
 
         {/* BOTTOM LEGEND & RESET BAR */}
-        <div className="absolute bottom-0 left-0 right-0 h-12 bg-white/90 backdrop-blur-md border-t border-[#161513]/10 flex items-center justify-between px-6 z-10">
+        <div className="print:hidden absolute bottom-0 left-0 right-0 h-12 bg-white/90 backdrop-blur-md border-t border-[#161513]/10 flex items-center justify-between px-6 z-10">
           <div className="flex items-center gap-5 overflow-x-auto py-1 scrollbar-none font-mono text-[11px] uppercase text-[#6f6a62]">
             <span className="text-[#161513] font-semibold">{displayRows.length} Particles</span>
             <span className="text-[#161513]/20">|</span>

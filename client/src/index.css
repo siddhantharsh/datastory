@@ -467,3 +467,16 @@
   background: var(--line);
 }
 
+
+/* Story export (Export Story as PDF -> window.print()). Interactive chrome
+   is hidden per-component via the print:hidden Tailwind variant; these rules
+   handle page-level layout so the narrative Acts print cleanly. */
+@media print {
+  html, body {
+    background: #ffffff !important;
+  }
+  .dashboard-slide {
+    break-inside: avoid;
+    min-height: 0 !important;
+  }
+}

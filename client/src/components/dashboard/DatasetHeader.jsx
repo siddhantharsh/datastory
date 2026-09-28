@@ -129,7 +129,7 @@ export function DatasetHeader({ onBackToHome, filteredRows = [] }) {
         </div>
 
         {/* Right Side: Actions (Dataset Switcher, Upload, Export) */}
-        <div className="flex flex-wrap items-center gap-3">
+        <div className="print:hidden flex flex-wrap items-center gap-3">
           
           {/* Dataset Selector Dropdown */}
           <div className="flex items-center bg-[#faf9f7] border border-[#161513]/15 rounded-[12px] px-3.5 py-2.5 text-xs">
@@ -209,6 +209,14 @@ export function DatasetHeader({ onBackToHome, filteredRows = [] }) {
                 >
                   <FileCode className="w-4 h-4 text-[#b5470b]" />
                   <span>Export as JSON</span>
+                </button>
+                <button
+                  onClick={() => { setIsExportOpen(false); window.print(); }}
+                  title="Opens your browser's print dialog — choose 'Save as PDF' as the destination"
+                  className="w-full text-left px-4 py-2.5 hover:bg-[#faf9f7] text-[#161513] flex items-center gap-2.5 cursor-pointer font-medium border-t border-[#161513]/8"
+                >
+                  <FileSpreadsheet className="w-4 h-4 text-[#b5470b]" />
+                  <span>Export Story as PDF</span>
                 </button>
               </div>
             )}

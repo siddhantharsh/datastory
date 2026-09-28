@@ -43,12 +43,12 @@ export function Navbar({ currentPage, setCurrentPage }) {
   return (
     <>
       {/* Top scroll progress indicator bar matching justus-john */}
-      <div className="scroll-progress">
+      <div className="scroll-progress print:hidden">
         <span style={{ width: `${scrollProgress}%` }} />
       </div>
 
       <header
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
+        className={`print:hidden fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
           isVisible ? 'translate-y-0' : '-translate-y-full'
         } ${
           lastScrollY > 20

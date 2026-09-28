@@ -287,14 +287,14 @@ export function DashboardPage({ onBackToHome }) {
     <div className="min-h-screen bg-[#faf9f7] text-[#161513] pt-20 pb-28 px-6 transition-colors font-sans relative">
       
       {/* FLOATING MINIMALIST SLIDESHOW COUNTER */}
-      <div className="fixed bottom-6 left-6 z-40 bg-[#161513] text-[#faf9f7] px-4 py-2 rounded-full font-mono text-xs shadow-lg flex items-center gap-2">
+      <div className="print:hidden fixed bottom-6 left-6 z-40 bg-[#161513] text-[#faf9f7] px-4 py-2 rounded-full font-mono text-xs shadow-lg flex items-center gap-2">
         <span className="w-2 h-2 rounded-full bg-[#b5470b] animate-pulse" />
         <span>SLIDE {String(activeSlide).padStart(2, '0')} / 07</span>
       </div>
 
       {/* STICKY CONSTELLATION FILTER INDICATOR */}
       {constellationFilter && (
-        <div className="sticky top-20 z-30 flex justify-center w-full mb-4 pointer-events-none">
+        <div className="print:hidden sticky top-20 z-30 flex justify-center w-full mb-4 pointer-events-none">
           <div className="bg-[#b5470b] text-white px-4 py-1.5 rounded-full font-mono text-xs flex items-center gap-3 shadow-md pointer-events-auto">
             <span>Filtered: <strong>{constellationFilter}</strong></span>
             <button onClick={() => setConstellationFilter(null)} className="hover:text-white/70 transition-colors">✕</button>
@@ -447,7 +447,7 @@ export function DashboardPage({ onBackToHome }) {
         <section
           id="act-7-explore"
           data-slide-index="7"
-          className={`dashboard-slide pt-16 border-t-2 border-[#161513]/15 transition-all duration-300 ease-out transform ${
+          className={`print:hidden dashboard-slide pt-16 border-t-2 border-[#161513]/15 transition-all duration-300 ease-out transform ${
             visibleSlides.has(7) ? 'opacity-100 translate-y-0' : 'opacity-20 translate-y-12'
           }`}
         >
